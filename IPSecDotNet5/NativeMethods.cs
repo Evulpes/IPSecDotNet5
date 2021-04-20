@@ -12,6 +12,10 @@ namespace IPSecDotNet5
     {
         public class Polstructs
         {
+            public static int IPSEC_REGISTRY_PROVIDER = 0;
+            public static int IPSEC_DIRECTORY_PROVIDER = 1;
+            public static int IPSEC_FILE_PROVIDER = 2;
+
             //Potentially requires explicit layout.
             public struct IPSEC_POLICY_DATA
             {
@@ -121,10 +125,12 @@ namespace IPSecDotNet5
 
             [DllImport("polstore", SetLastError = true)]
             protected static extern int IPSecGetFilterData(IntPtr hPolicyStore, Guid FilterGUID, IntPtr ppIpsecFilterData);
+
+            [DllImport("polstore", SetLastError = true)]
+            public static extern int IPSecCreateFilterData(IntPtr hPolicyStore, IntPtr pIpsecFilterData);
         }
         public static class Unknown
         {
-            public static int IPSEC_REGISTRY_PROVIDER = 0;
             [StructLayout(LayoutKind.Explicit)]
             public struct IPSEC_FILTER //Missing definition, gauged from IDA / x64dbg
             {
@@ -138,7 +144,7 @@ namespace IPSecDotNet5
                 public uint DstMask;
                 //[FieldOffset(0)] //Unknown
                 //public uint TunnelAddr;
-                [FieldOffset(88)] //Unknown
+                [FieldOffset(88)]
                 public uint Protocol; //-- 0x6 = TCP, 0x11 = UDP
                 [FieldOffset(76)]
                 public uint SrcPort;
