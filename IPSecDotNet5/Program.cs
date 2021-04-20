@@ -17,30 +17,25 @@ namespace IPSecDotNet5
 
             int hr = IPSecGetAssignedPolicyData(hStore, out IPSEC_POLICY_DATA test);
 
-            if (hr == 0)
-            {
-                _ = IPSecUnassignPolicy(hStore, test.PolicyIdentifier);
-                _ = IPSecAssignPolicy(hStore, test.PolicyIdentifier);
+            if (hr != 0)
+                return;
 
 
-                _ = IPSecGetISAKMPData(hStore, test.ISAKMPIdentifier, out IPSEC_ISAKMP_DATA temp);
+            _ = IPSecUnassignPolicy(hStore, test.PolicyIdentifier);
+            _ = IPSecAssignPolicy(hStore, test.PolicyIdentifier);
 
-                _ = IPSecGetFilterData(hStore, new Guid("10cc0b07-86c0-4477-8f6e-95dc0c67e8f5"), out IPSEC_FILTER_DATA ipsecFilterData);
 
-                int brkp = 0;
-            }
+            _ = IPSecGetISAKMPData(hStore, test.ISAKMPIdentifier, out IPSEC_ISAKMP_DATA temp);
 
-            IPSEC_POLICY_DATA myIPSECPolicy = new IPSEC_POLICY_DATA();
+            _ = IPSecGetFilterData(hStore, new Guid("3980bbd0-5120-41c6-bda3-8005f877d7e2"), out IPSEC_FILTER_DATA ipsecFilterData);
 
-            myIPSECPolicy.pszIpsecName = "TestPolicy";
-            myIPSECPolicy.pszDescription = "TestDescription";
+
+            IntPtr tempPTr = System.Runtime.InteropServices.Marshal.ReadIntPtr(ipsecFilterData.ppFilterSpecs);
+            IPSEC_FILTER_SPEC fs = (IPSEC_FILTER_SPEC)System.Runtime.InteropServices.Marshal.PtrToStructure(tempPTr, typeof(IPSEC_FILTER_SPEC));
+
+
+            int brkp = 0;
             
-            myIPSECPolicy.pIpsecISAKMPData = IntPtr.Zero;
-            //myIPSECPolicy.
-            
-            
-            
-            int meme = 5;
 
         }
     }
