@@ -30,9 +30,8 @@ namespace IPSecDotNet5
             _ = IPSecGetFilterData(hStore, new Guid("3980bbd0-5120-41c6-bda3-8005f877d7e2"), out IPSEC_FILTER_DATA ipsecFilterData);
 
 
-            IntPtr tempPTr = System.Runtime.InteropServices.Marshal.ReadIntPtr(ipsecFilterData.ppFilterSpecs);
-            IPSEC_FILTER_SPEC fs = (IPSEC_FILTER_SPEC)System.Runtime.InteropServices.Marshal.PtrToStructure(tempPTr, typeof(IPSEC_FILTER_SPEC));
-
+            _ = IPSecGetFilterSpec(ipsecFilterData.ppFilterSpecs, out IPSEC_FILTER_SPEC filterSpec);
+            
 
             int brkp = 0;
             

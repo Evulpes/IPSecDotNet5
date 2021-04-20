@@ -63,6 +63,14 @@ namespace IPSecDotNet5
             return hr;
         }
 
-
+        public static int IPSecGetFilterSpec(IntPtr ppFilterSpecs, out IPSEC_FILTER_SPEC filterSpecs)
+        {
+            filterSpecs = new IPSEC_FILTER_SPEC();
+            if (ppFilterSpecs == IntPtr.Zero)
+                return 1;
+            
+            filterSpecs = (IPSEC_FILTER_SPEC)Marshal.PtrToStructure(Marshal.ReadIntPtr(ppFilterSpecs), typeof(IPSEC_FILTER_SPEC));
+            return 0;
+        }
     }
 }
