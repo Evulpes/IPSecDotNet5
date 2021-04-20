@@ -12,18 +12,44 @@ namespace IPSecDotNet5
     {
         public class Polstructs
         {
-
+            //Potentially requires explicit layout.
             public struct IPSEC_POLICY_DATA
             {
                 public Guid PolicyIdentifier;
-                int dwPollingInterval;
-                IntPtr pIpsecISAKMPData;
-                IntPtr ppIpsecNFAData;
-                int dwNumNFACount;
-                int dwWhenChanged;
-                [MarshalAs(UnmanagedType.LPWStr)] string pszIpsecName;
-                [MarshalAs(UnmanagedType.LPWStr)] string pszDescription;
-                Guid ISAKMPIdentifier;
+                public int dwPollingInterval;
+                public IntPtr pIpsecISAKMPData;
+                public IntPtr ppIpsecNFAData;
+                public int dwNumNFACount;
+                public int dwWhenChanged;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszIpsecName;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszDescription;
+                public Guid ISAKMPIdentifier;
+            }
+            
+            [StructLayout(LayoutKind.Explicit)]
+            public struct IPSEC_ISAKMP_DATA
+            {
+                //First 16 bytes repeat of GUID.
+                [FieldOffset(16)]
+                public Guid ISAKMPIdentifier;
+                [FieldOffset(32)]
+                public IntPtr ISAKMPPolicy; //ISAKMP_POLICY - missing definition
+                [FieldOffset(76)]
+                public int dwNumISAKMPSecurityMethods;
+                [FieldOffset(80)]
+                public IntPtr pSecurityMethods;
+                [FieldOffset(88)]
+                public int dwWhenChanged;
+            }
+        
+            public struct IPSEC_FILTER_DATA
+            {
+                public Guid FilterIdentifier;
+                public int dwNumFilterSpecs;
+                public IntPtr ppFilterSpecs;
+                public int dwWhenChanged;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszIpsecName;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszIpsecDescription;
             }
         }
         public class Polstore2 : Polstructs
@@ -56,6 +82,7 @@ namespace IPSecDotNet5
             /// <returns></returns>
             [DllImport("polstore", SetLastError = true)]
             public static extern int IPSecUnassignPolicy(IntPtr hPolicyStore, Guid PolicyGuid);
+  
             /// <summary>
             /// 
             /// </summary>
@@ -71,6 +98,12 @@ namespace IPSecDotNet5
             /// <returns></returns>
             [DllImport("polstore", SetLastError = true)]
             public static extern int IPSecAssignPolicy(IntPtr hPolicyStore, Guid PolicyGuid);
+
+            [DllImport("polstore", SetLastError = true)]
+            protected static extern int IPSecGetISAKMPData(IntPtr hPolicyStore, Guid ISAKMPGUID, IntPtr ppIpsecISAKMPData);
+
+            [DllImport("polstore", SetLastError = true)]
+            protected static extern int IPSecGetFilterData(IntPtr hPolicyStore, Guid FilterGUID, IntPtr ppIpsecFilterData);
         }
         public static class Unknown
         {

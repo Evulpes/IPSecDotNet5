@@ -20,6 +20,49 @@ namespace IPSecDotNet5
 
             return hr;
         }
+        public static int IPSecGetISAKMPData(IntPtr hStore, Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecISAKMPData)
+        {
+            ipsecISAKMPData = new IPSEC_ISAKMP_DATA();
+
+            //Allocate memory for the struct pointer.
+            IntPtr ppIpsecISAKMPData = Marshal.AllocHGlobal(Marshal.SizeOf(new IntPtr()));
+            
+            
+            int hr = IPSecGetISAKMPData(hStore, ISAKMPGUID, ppIpsecISAKMPData);
+            if (hr != 0)
+                return hr;
+
+            //Dereference the ppIpsecISAKMPData into a pointer.
+            IntPtr pIpsecISAKMPData = Marshal.ReadIntPtr(ppIpsecISAKMPData);
+
+            //Cast the ptr.
+            ipsecISAKMPData = (IPSEC_ISAKMP_DATA)Marshal.PtrToStructure(pIpsecISAKMPData, typeof(IPSEC_ISAKMP_DATA));
+
+            //Free memory allocations.
+            Marshal.FreeHGlobal(ppIpsecISAKMPData);
+
+            return hr;
+        }
+        public static int IPSecGetFilterData(IntPtr hStore, Guid filterGuid, out IPSEC_FILTER_DATA ipsecFilterData)
+        {
+            ipsecFilterData = new IPSEC_FILTER_DATA();
+            
+            //Allocate memory for the struct pointer.
+            IntPtr ppIpsecFilterData = Marshal.AllocHGlobal(Marshal.SizeOf(new IntPtr()));
+
+            int hr = IPSecGetFilterData(hStore, filterGuid, ppIpsecFilterData);
+            if (hr != 0)
+                return hr;
+
+            //Dereference the ppIpsecISAKMPData into a pointer.
+            IntPtr pIpsecFilterData = Marshal.ReadIntPtr(ppIpsecFilterData);
+
+            ipsecFilterData = (IPSEC_FILTER_DATA)Marshal.PtrToStructure(pIpsecFilterData, typeof(IPSEC_FILTER_DATA));
+
+            Marshal.FreeHGlobal(ppIpsecFilterData);
+            return hr;
+        }
+
 
     }
 }
