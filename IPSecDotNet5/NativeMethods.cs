@@ -74,9 +74,9 @@ namespace IPSecDotNet5
                 [FieldOffset(40)]
                 public int dwMirrorFlag;
                 [FieldOffset(44)]
-                public int sourceAddressLength; //I think (set to 4 for standard x.x.x.x).
+                public int unknownFlag4; //Needs to be set to 4 when using IPv4 Address.
                 [FieldOffset(48)]
-                public int sourceAddressExists; //I think. (seems to need to be set to 1).
+                public int unknownFlag1; //Needs to be set to 1 when using IPv4 Subnet.
                 [FieldOffset(52)]
                 public Unknown.IPSEC_FILTER filter; //IPSEC_FILTER -- missing definition.
                 
@@ -156,11 +156,11 @@ namespace IPSecDotNet5
                 [FieldOffset(88)]
                 public uint Protocol; //-- 0x6 = TCP, 0x11 = UDP
                 [FieldOffset(72)]
-                public uint SrcPortCount; //I think.
+                public uint SrcUnknownFlag1; //Potentially a counter. Set to 1 if declaring SrcPort.
                 [FieldOffset(76)]
                 public uint SrcPort;
                 [FieldOffset(80)]
-                public uint DstPortCount; //I think.
+                public uint DstUnknownFlag1; //Potentially a counter. Set to 1 if declaring DstPort.
                 [FieldOffset(84)]
                 public uint DstPort;
                 [FieldOffset(89)] //Unknown

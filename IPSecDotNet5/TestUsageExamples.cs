@@ -37,18 +37,18 @@ namespace IPSecDotNet5
                     DstPort = 135,
                     Flags = 0x0,
                     Pad = '\0',
-                    Protocol = 0x6,
+                    Protocol = 0x11,
                     SrcAddr = 0x0,
                     SrcMask = 0x0,
-                    SrcPort = 0,
-                    SrcPortCount = 0,
-                    DstPortCount = 1,
+                    SrcPort = 8888,
+                    SrcUnknownFlag1 = 1,
+                    DstUnknownFlag1 = 0,
                     TunnelAddr = 0,
                     TunnelFilter = false
                 },
                 pszDescription = "",
-                sourceAddressLength = 0x0,
-                sourceAddressExists = 0x0
+                unknownFlag4 = 0x0,
+                unknownFlag1 = 0x0
             };
             IPSEC_FILTER_SPEC ExamplePolicyFilterSpec2 = new IPSEC_FILTER_SPEC
             {
@@ -64,17 +64,17 @@ namespace IPSecDotNet5
                     Flags = 0x0,
                     Pad = '\0',
                     Protocol = 0x6,
-                    SrcAddr = 0x0,
-                    SrcMask = 0x0,
+                    SrcAddr = 0,
+                    SrcMask = 0,
                     SrcPort = 0,
-                    SrcPortCount = 0,
-                    DstPortCount = 1,
+                    SrcUnknownFlag1 = 0,
+                    DstUnknownFlag1 = 1,
                     TunnelAddr = 0,
                     TunnelFilter = false
                 },
                 pszDescription = "",
-                sourceAddressLength = 0x0,
-                sourceAddressExists = 0x0
+                unknownFlag1 = 0x0,
+                unknownFlag4 = 0x0
             };
 
             IntPtr pExamplePolicyFilterSpec1 = Marshal.AllocHGlobal(Marshal.SizeOf(ExamplePolicyFilterSpec1));
