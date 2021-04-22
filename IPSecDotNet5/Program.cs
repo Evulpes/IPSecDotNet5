@@ -16,7 +16,7 @@ namespace IPSecDotNet5
                 throw new Exception();
 
 
-            TestUsageExamples.CreateIpSecFilterLists(hStore);
+            //TestUsageExamples.CreateIpSecFilterLists(hStore);
 
 
             int hr = IPSecGetAssignedPolicyData(hStore, out IPSEC_POLICY_DATA test);
@@ -37,6 +37,7 @@ namespace IPSecDotNet5
 
 
             }
+
         }
     }
 }

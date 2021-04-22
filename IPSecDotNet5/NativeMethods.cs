@@ -34,14 +34,16 @@ namespace IPSecDotNet5
             public struct IPSEC_ISAKMP_DATA
             {
                 //First 16 bytes repeat of GUID.
-                [FieldOffset(16)]
+                [FieldOffset(0)]
                 public Guid ISAKMPIdentifier;
+                [FieldOffset(16)]
+                public Guid ISAKMPIdentifierCopy;
                 [FieldOffset(32)]
-                public IntPtr ISAKMPPolicy; //ISAKMP_POLICY - missing definition
+                public IntPtr ISAKMPPolicy; //ISAKMP_POLICY - missing definition.
                 [FieldOffset(76)]
                 public int dwNumISAKMPSecurityMethods;
                 [FieldOffset(80)]
-                public IntPtr pSecurityMethods;
+                public IntPtr pSecurityMethods; //PCRYPTO_BUNDLE - missing definition.
                 [FieldOffset(88)]
                 public int dwWhenChanged;
             }
@@ -78,7 +80,7 @@ namespace IPSecDotNet5
                 [FieldOffset(48)]
                 public int unknownFlag1; //Needs to be set to 1 when using IPv4 Subnet.
                 [FieldOffset(52)]
-                public Unknown.IPSEC_FILTER filter; //IPSEC_FILTER -- missing definition.
+                public Ipsec.IPSEC_FILTER filter; //IPSEC_FILTER -- missing definition.
                 
             }
         }
@@ -137,11 +139,13 @@ namespace IPSecDotNet5
 
             [DllImport("polstore", SetLastError = true)]
             public static extern int IPSecCreateFilterData(IntPtr hPolicyStore, IntPtr pIpsecFilterData);
+            [DllImport("polstore", SetLastError = true)]
+            public static extern int IPSecCreateISAKMPData(IntPtr hPolicyStore, IntPtr pIpsecISAKMPData);
         }
-        public static class Unknown
+        public static class Ipsec
         {
             [StructLayout(LayoutKind.Explicit)]
-            public struct IPSEC_FILTER //Missing definition, gauged from IDA / x64dbg
+            public struct IPSEC_FILTER
             {
                 [FieldOffset(0)]
                 public uint SrcAddr;

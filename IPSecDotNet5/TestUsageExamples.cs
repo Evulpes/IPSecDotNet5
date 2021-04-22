@@ -30,7 +30,7 @@ namespace IPSecDotNet5
                 FilterSpecGUID = Guid.NewGuid(),
                 pszDestDNSName = "",
                 pszSrcDNSName = "",
-                filter = new NativeMethods.Unknown.IPSEC_FILTER
+                filter = new NativeMethods.Ipsec.IPSEC_FILTER
                 {
                     DstAddr = 0x0,
                     DstMask = 0x0,
@@ -56,7 +56,7 @@ namespace IPSecDotNet5
                 FilterSpecGUID = Guid.NewGuid(),
                 pszDestDNSName = "",
                 pszSrcDNSName = "",
-                filter = new NativeMethods.Unknown.IPSEC_FILTER
+                filter = new NativeMethods.Ipsec.IPSEC_FILTER
                 {
                     DstAddr = 0x0,
                     DstMask = 0x0,
