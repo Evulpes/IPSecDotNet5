@@ -46,10 +46,14 @@ namespace IPSecDotNet5
                 public int dwWhenChanged;
             }
         
+            /// <summary>
+            /// 
+            /// </summary>
             public struct IPSEC_FILTER_DATA
             {
                 public Guid FilterIdentifier;
                 public int dwNumFilterSpecs;
+                //A pointer to an unmanaged block of memory containing pointers to IPSEC_FILTER_SPEC structs.
                 public IntPtr ppFilterSpecs;
                 public int dwWhenChanged;
                 [MarshalAs(UnmanagedType.LPWStr)] public string pszIpsecName;
@@ -69,8 +73,13 @@ namespace IPSecDotNet5
                 public Guid FilterSpecGUID;
                 [FieldOffset(40)]
                 public int dwMirrorFlag;
+                [FieldOffset(44)]
+                public int sourceAddressLength; //I think (set to 4 for standard x.x.x.x).
+                [FieldOffset(48)]
+                public int sourceAddressExists; //I think. (seems to need to be set to 1).
                 [FieldOffset(52)]
                 public Unknown.IPSEC_FILTER filter; //IPSEC_FILTER -- missing definition.
+                
             }
         }
         public class Polstore2 : Polstructs
@@ -142,20 +151,24 @@ namespace IPSecDotNet5
                 public uint DstAddr;
                 [FieldOffset(55)]
                 public uint DstMask;
-                //[FieldOffset(0)] //Unknown
-                //public uint TunnelAddr;
+                [FieldOffset(44)] //Unknown
+                public uint TunnelAddr;
                 [FieldOffset(88)]
                 public uint Protocol; //-- 0x6 = TCP, 0x11 = UDP
+                [FieldOffset(72)]
+                public uint SrcPortCount; //I think.
                 [FieldOffset(76)]
                 public uint SrcPort;
+                [FieldOffset(80)]
+                public uint DstPortCount; //I think.
                 [FieldOffset(84)]
                 public uint DstPort;
-                //[FieldOffset(0)] //Unknown
-                //public bool TunnelFilter;
-                //[FieldOffset(0)] //Unknown
-                //public char Pad;
-                //[FieldOffset(0)] //Unknown
-                //public ushort Flags;
+                [FieldOffset(89)] //Unknown
+                public bool TunnelFilter;
+                [FieldOffset(90)] //Unknown
+                public char Pad;
+                [FieldOffset(91)] //Unknown
+                public ushort Flags;
             }
 
         }
