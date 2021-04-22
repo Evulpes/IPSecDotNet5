@@ -9,6 +9,10 @@ namespace IPSecDotNet5
 {
     class TestUsageExamples : FriendlyMethods
     {
+        /// <summary>
+        /// Creates a filter list with 2 destinational ports. IP addresses do not yet work.
+        /// </summary>
+        /// <param name="hPolicyStore"></param>
         public static void CreateIpSecFilterLists(IntPtr hPolicyStore)
         {
             IPSEC_FILTER_DATA exampleFilterData = new IPSEC_FILTER_DATA
@@ -90,6 +94,39 @@ namespace IPSecDotNet5
             int loop = IPSecCreateFilterData(hPolicyStore, pExampleFilterData);
 
             System.Diagnostics.Debug.WriteLine(loop);
+            /*netsh ipsec static show all:
+                FilterList Name        : exampleFilterData
+                Description            : ExampleDescription
+                Store                  : Local Store <NCIRMLT001>
+                Last Modified          : 22/04/2021 18:47:44
+                GUID                   : {C4CC8FE0-8DDB-48C5-A285-F56C21ABA666}
+                No. of Filters         : 2
+                Filter(s)
+                ---------
+                Description            : NONE
+                Mirrored               : NO
+                Source IP Address      : <Any IP Address>
+                Source Mask            : 0.0.0.0
+                Source DNS Name        : <Any IP Address>
+                Destination IP Address : <Any IP Address>
+                Destination Mask       : 0.0.0.0
+                Destination DNS Name   : <Any IP Address>
+                Protocol               : TCP
+                Source Port            : ANY
+                Destination Port       : 135
+
+                Description            : NONE
+                Mirrored               : NO
+                Source IP Address      : <Any IP Address>
+                Source Mask            : 0.0.0.0
+                Source DNS Name        : <Any IP Address>
+                Destination IP Address : <Any IP Address>
+                Destination Mask       : 0.0.0.0
+                Destination DNS Name   : <Any IP Address>
+                Protocol               : TCP
+                Source Port            : ANY
+                Destination Port       : 8080
+            */
         }
     }
 }
