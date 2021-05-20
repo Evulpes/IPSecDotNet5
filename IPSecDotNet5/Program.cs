@@ -30,11 +30,7 @@ namespace IPSecDotNet5
                 _ = IPSecGetFilterData(hStore, new Guid("ef0eedba-1079-4cfd-8b06-5cc6f62e94c0"), out IPSEC_FILTER_DATA ipsecFilterData);
                 _ = IPSecGetFilterSpec(ipsecFilterData.ppFilterSpecs, out IPSEC_FILTER_SPEC filterSpec);
 
-                //ipsecFilterData.pszIpsecName = "testMe";
-                //IntPtr pFilterData = Marshal.AllocHGlobal(Marshal.SizeOf(ipsecFilterData));
-                //Marshal.StructureToPtr(ipsecFilterData, pFilterData, false);
-                //IPSecCreateFilterData(hStore, pFilterData);
-
+                int mememe = 5;
 
             }
 

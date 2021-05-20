@@ -30,21 +30,13 @@ namespace IPSecDotNet5
                 public Guid ISAKMPIdentifier;
             }
             
-            [StructLayout(LayoutKind.Explicit)]
+            //[StructLayout(LayoutKind.Explicit)]
             public struct IPSEC_ISAKMP_DATA
             {
-                //First 16 bytes repeat of GUID.
-                [FieldOffset(0)]
                 public Guid ISAKMPIdentifier;
-                [FieldOffset(16)]
-                public Guid ISAKMPIdentifierCopy;
-                [FieldOffset(32)]
-                public ISAKMP_POLICY ISAKMPPolicy; //ISAKMP_POLICY - missing definition.
-                [FieldOffset(/*76*/86)]
+                public Oakdefs.ISAKMP_POLICY ISAKMPPolicy;
                 public int dwNumISAKMPSecurityMethods;
-                [FieldOffset(/*80*/90)]
                 public IntPtr pSecurityMethods; //PCRYPTO_BUNDLE
-                [FieldOffset(/*88*/98)]
                 public int dwWhenChanged;
             }
         
@@ -136,6 +128,7 @@ namespace IPSecDotNet5
 
             [DllImport("polstore", SetLastError = true)]
             public static extern int IPSecCreateFilterData(IntPtr hPolicyStore, IntPtr pIpsecFilterData);
+            
             [DllImport("polstore", SetLastError = true)]
             public static extern int IPSecCreateISAKMPData(IntPtr hPolicyStore, IntPtr pIpsecISAKMPData);
         }

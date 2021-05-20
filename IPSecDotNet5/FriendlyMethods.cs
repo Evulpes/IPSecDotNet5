@@ -62,7 +62,6 @@ namespace IPSecDotNet5
             Marshal.FreeHGlobal(ppIpsecFilterData);
             return hr;
         }
-
         public static int IPSecGetFilterSpec(IntPtr ppFilterSpecs, out IPSEC_FILTER_SPEC filterSpecs)
         {
             filterSpecs = new IPSEC_FILTER_SPEC();

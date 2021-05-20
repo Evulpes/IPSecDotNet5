@@ -15,7 +15,7 @@ namespace IPSecDotNet5
         /// <param name="hPolicyStore"></param>
         public static void CreateIpSecFilterLists(IntPtr hPolicyStore)
         {
-            IPSEC_FILTER_DATA exampleFilterData = new IPSEC_FILTER_DATA
+            IPSEC_FILTER_DATA exampleFilterData = new()
             {
                 dwNumFilterSpecs = 0x2,
                 dwWhenChanged = (int)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
@@ -24,7 +24,7 @@ namespace IPSecDotNet5
                 pszIpsecDescription = "ExampleDescription",
                 pszIpsecName = "exampleFilterData"
             };
-            IPSEC_FILTER_SPEC ExamplePolicyFilterSpec1 = new IPSEC_FILTER_SPEC
+            IPSEC_FILTER_SPEC ExamplePolicyFilterSpec1 = new()
             {
                 dwMirrorFlag = 0x0,
                 FilterSpecGUID = Guid.NewGuid(),
@@ -50,7 +50,7 @@ namespace IPSecDotNet5
                 unknownFlag4 = 0x0,
                 unknownFlag1 = 0x0
             };
-            IPSEC_FILTER_SPEC ExamplePolicyFilterSpec2 = new IPSEC_FILTER_SPEC
+            IPSEC_FILTER_SPEC ExamplePolicyFilterSpec2 = new()
             {
                 dwMirrorFlag = 0x0,
                 FilterSpecGUID = Guid.NewGuid(),
