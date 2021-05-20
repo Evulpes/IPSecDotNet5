@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Net;
-
+using System.Runtime;
 namespace IPSecDotNet5
 {
     class NativeMethods
@@ -39,18 +39,15 @@ namespace IPSecDotNet5
                 [FieldOffset(16)]
                 public Guid ISAKMPIdentifierCopy;
                 [FieldOffset(32)]
-                public IntPtr ISAKMPPolicy; //ISAKMP_POLICY - missing definition.
-                [FieldOffset(76)]
+                public ISAKMP_POLICY ISAKMPPolicy; //ISAKMP_POLICY - missing definition.
+                [FieldOffset(/*76*/86)]
                 public int dwNumISAKMPSecurityMethods;
-                [FieldOffset(80)]
-                public IntPtr pSecurityMethods; //PCRYPTO_BUNDLE - missing definition.
-                [FieldOffset(88)]
+                [FieldOffset(/*80*/90)]
+                public IntPtr pSecurityMethods; //PCRYPTO_BUNDLE
+                [FieldOffset(/*88*/98)]
                 public int dwWhenChanged;
             }
         
-            /// <summary>
-            /// 
-            /// </summary>
             public struct IPSEC_FILTER_DATA
             {
                 public Guid FilterIdentifier;
@@ -175,6 +172,48 @@ namespace IPSecDotNet5
                 public ushort Flags;
             }
 
+        }
+        public static class Oakdefs
+        {
+            public struct OAKLEY_ALGORITHM
+            {
+                uint AlgorithmIdentifier;
+                uint KeySize;
+                uint Rounds;
+            }
+            public struct OAKLEY_LIFETIME
+            {
+                int KBytes;
+                int Seconds;
+            }
+            public struct CRYPTO_BUNDLE
+            {
+                byte MajorVersion;
+                byte MinorVersion;
+                OAKLEY_ALGORITHM EncryptionAlgorithm;
+                OAKLEY_ALGORITHM HashAlgorithm;
+                OAKLEY_ALGORITHM PseudoRandomFunction;  //unused
+                byte AuthenticationMethod;
+                int OakleyGroup;
+                int QuickModeLimit;
+                OAKLEY_LIFETIME Lifetime;
+                bool PfsIdentityRequired;
+            }
+            public struct ISAKMP_POLICY
+            {
+                Guid PolicyId;
+                bool IdentityProtectionRequired;
+                bool PfsIdentityRequired;
+                int ThreadingFactor;
+                int AquireLimit;
+                int ReceiveLimit;
+                int AquireSize;
+                int ReceiveSize;
+                int RepearInterval;
+                int RpcMaxCalls;
+                int RetryInterval;
+                int RetryLimit;
+            }
         }
     }
 }
