@@ -89,5 +89,14 @@ namespace IPSecDotNet5
             filterSpecs = (IPSEC_FILTER_SPEC)Marshal.PtrToStructure(Marshal.ReadIntPtr(ppFilterSpecs), typeof(IPSEC_FILTER_SPEC));
             return 0;
         }
+        public static int IPSecCreateNegPolData(IntPtr hStore, IPSEC_NEGPOL_DATA ipsecNegPolData)
+        {
+
+            IntPtr pIpsecNegPolData = Marshal.AllocHGlobal(Marshal.SizeOf(ipsecNegPolData));
+            Marshal.StructureToPtr(ipsecNegPolData, pIpsecNegPolData, false);
+
+
+            return IPSecCreateNegPolData(hStore, pIpsecNegPolData);
+        }
     }
 }

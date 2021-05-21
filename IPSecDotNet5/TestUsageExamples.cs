@@ -128,5 +128,21 @@ namespace IPSecDotNet5
                 Destination Port       : 8080
             */
         }
+        public static void CreateFilterAction(IntPtr hPolicyStore)
+        {
+            IPSEC_NEGPOL_DATA filterAction = new();
+            filterAction.pszIpsecName = "BlockAction";
+            filterAction.pIpsecSecurityMethods = IntPtr.Zero;
+            filterAction.dwWhenChanged = 0x60a6ff37; //HARDCODED TIME.
+            filterAction.NegPolAction = GUID_NEGOTIATION_ACTION_BLOCK;
+            filterAction.NegPolIdentifier = Guid.NewGuid();
+            filterAction.NegPolType = GUID_NEGOTATION_TYPE_STANDARD;
+            filterAction.pszDescription = "None";
+
+
+            int testVar = IPSecCreateNegPolData(hPolicyStore, filterAction);
+            int brkme = 5;
+
+        }
     }
 }

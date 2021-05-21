@@ -12,7 +12,8 @@ namespace IPSecDotNet5
     {
         public class Polstructs
         {
-            public static readonly Guid GUID_NEGOTIATION_ACTION_BLOCK = new("3f91a819-7647-11d1-864d-d46a00000000");
+
+            
             public static int IPSEC_REGISTRY_PROVIDER = 0;
             public static int IPSEC_DIRECTORY_PROVIDER = 1;
             public static int IPSEC_FILE_PROVIDER = 2;
@@ -54,14 +55,14 @@ namespace IPSecDotNet5
 
             public struct IPSEC_NEGPOL_DATA
             {
-                Guid NegPolIdentifier;
-                Guid NegPolAction;
-                Guid NegPolType;
-                int dwSecurityMethodCount;
-                IntPtr pIpsecSecurityMethods; //IPSEC_SECURITY_METHOD *
-                int dwWhenChanged;
-                [MarshalAs(UnmanagedType.LPWStr)]string pszIpsecName;
-                [MarshalAs(UnmanagedType.LPWStr)]string pszDescription;
+                public Guid NegPolIdentifier;
+                public Guid NegPolAction;
+                public Guid NegPolType;
+                public int dwSecurityMethodCount;
+                public IntPtr pIpsecSecurityMethods; //IPSEC_SECURITY_METHOD *
+                public int dwWhenChanged;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszIpsecName;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszDescription;
             }
 
             [StructLayout(LayoutKind.Explicit)]
@@ -88,6 +89,8 @@ namespace IPSecDotNet5
         }
         public class Polstore2 : Polstructs
         {
+            public static readonly Guid GUID_NEGOTIATION_ACTION_BLOCK = new("3f91a819-7647-11d1-864d-d46a00000000");
+            public static readonly Guid GUID_NEGOTATION_TYPE_STANDARD = new("62f49e10-6c37-11d1-864c-14a300000000");
             /// <summary>
             /// 
             /// </summary>
@@ -99,6 +102,7 @@ namespace IPSecDotNet5
             [DllImport("polstore", SetLastError = true)]
             public static extern int IPSecOpenPolicyStore([MarshalAs(UnmanagedType.LPWStr)] string pszMachineName, int dwTypeOfStore, [MarshalAs(UnmanagedType.LPWStr)] string pszFileName, out IntPtr phPolicyStore);
             
+            #region IPSecGet
             /// <summary>
             /// 
             /// </summary>
@@ -107,7 +111,16 @@ namespace IPSecDotNet5
             /// <returns></returns>
             [DllImport("polstore", SetLastError = true)]
             protected static extern int IPSecGetAssignedPolicyData(IntPtr hStore, out IntPtr pipspd);
-        
+            [DllImport("polstore", SetLastError = true)]
+            protected static extern int IPSecGetISAKMPData(IntPtr hPolicyStore, Guid ISAKMPGUID, IntPtr ppIpsecISAKMPData);
+
+            [DllImport("polstore", SetLastError = true)]
+            protected static extern int IPSecGetFilterData(IntPtr hPolicyStore, Guid FilterGUID, IntPtr ppIpsecFilterData);
+
+            [DllImport("polstore", SetLastError = true)]
+            protected static extern int IPSecGetNegPolData(IntPtr hPolicyStore, Guid NegPolGuid, IntPtr ppIpsecNegPolData);
+            #endregion
+            #region IPSecAssign
             /// <summary>
             /// 
             /// </summary>
@@ -116,14 +129,6 @@ namespace IPSecDotNet5
             /// <returns></returns>
             [DllImport("polstore", SetLastError = true)]
             public static extern int IPSecUnassignPolicy(IntPtr hPolicyStore, Guid PolicyGuid);
-  
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="pIpsecPolicyData"></param>
-            [DllImport("polstore", SetLastError = true)]
-            protected static extern void IPSecFreePolicyData(IntPtr pIpsecPolicyData);
-
             /// <summary>
             /// 
             /// </summary>
@@ -133,20 +138,18 @@ namespace IPSecDotNet5
             [DllImport("polstore", SetLastError = true)]
             public static extern int IPSecAssignPolicy(IntPtr hPolicyStore, Guid PolicyGuid);
 
-            [DllImport("polstore", SetLastError = true)]
-            protected static extern int IPSecGetISAKMPData(IntPtr hPolicyStore, Guid ISAKMPGUID, IntPtr ppIpsecISAKMPData);
-
-            [DllImport("polstore", SetLastError = true)]
-            protected static extern int IPSecGetFilterData(IntPtr hPolicyStore, Guid FilterGUID, IntPtr ppIpsecFilterData);
-
-            [DllImport("polstore", SetLastError = true)]
-            protected static extern int IPSecGetNegPolData(IntPtr hPolicyStore, Guid NegPolGuid, IntPtr ppIpsecNegPolData);
-
+            #endregion
+            #region IPSecCreate
             [DllImport("polstore", SetLastError = true)]
             internal static extern int IPSecCreateFilterData(IntPtr hPolicyStore, IntPtr pIpsecFilterData);
-            
+
             [DllImport("polstore", SetLastError = true)]
-            public static extern int IPSecCreateISAKMPData(IntPtr hPolicyStore, IntPtr pIpsecISAKMPData);
+            internal static extern int IPSecCreateISAKMPData(IntPtr hPolicyStore, IntPtr pIpsecISAKMPData);
+
+            [DllImport("polstore", SetLastError = true)]
+            internal static extern int IPSecCreateNegPolData(IntPtr hPolicyStore, IntPtr pIpsecNegPolData);
+            #endregion
+
         }
         public static class Ipsec
         {

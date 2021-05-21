@@ -16,9 +16,10 @@ namespace IPSecDotNet5
                 throw new Exception();
 
 
-            int hrTest = IPSecGetNegPolData(hStore, new Guid("7cdf3111-4c61-4f3b-8785-7a31c1016738"), out IPSEC_NEGPOL_DATA temp);
+            
+            
             TestUsageExamples.CreateIpSecFilterLists(hStore);
-
+            TestUsageExamples.CreateFilterAction(hStore);
 
             int hr = IPSecGetAssignedPolicyData(hStore, out IPSEC_POLICY_DATA test);
 
