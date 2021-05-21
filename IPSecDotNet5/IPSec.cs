@@ -133,6 +133,12 @@ namespace IPSecDotNet5
             return hr;
         }
 
+        public int TEMP_CREATEIPSECSAKMPDATA(IPSEC_ISAKMP_DATA data)
+        {
+            int hr = FriendlyMethods.IPSecCreateISAKMPData(hStore, data);
+            return hr;
+        }
+
         /// <summary>
         /// Opens a handle to the policy store.
         /// </summary>
@@ -148,13 +154,25 @@ namespace IPSecDotNet5
             );
         }
 
+        public int GetAssignedPolicyData(out IPSEC_POLICY_DATA assignedPolicyData) => IPSecGetAssignedPolicyData(hStore, out  assignedPolicyData);
 
-        public int ClosePolicyStore()
+        public int GetISAKMPData(Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecIsakmpData)=> IPSecGetISAKMPData(hStore, ISAKMPGUID, out ipsecIsakmpData);
+
+        public int GetSecurityMethods(IntPtr pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE securityMethods)
         {
-            throw new NotImplementedException();
+            securityMethods = (NativeMethods.Oakdefs.CRYPTO_BUNDLE)Marshal.PtrToStructure(pSecurityMethods, typeof(NativeMethods.Oakdefs.CRYPTO_BUNDLE));
+
+
+            return 0;
         }
+        
+        /// <summary>
+        /// Closes a handle to the policy store.
+        /// </summary>
+        /// <returns>>A WinError System Error Code.</returns>
+        public int ClosePolicyStore() => IPSecClosePolicyStore(hStore);
 
-
+        
         public enum FilterActionType
         {
             Allow,

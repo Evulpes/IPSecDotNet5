@@ -18,7 +18,6 @@ namespace IPSecDotNet5
             public static int IPSEC_DIRECTORY_PROVIDER = 1;
             public static int IPSEC_FILE_PROVIDER = 2;
 
-            //Potentially requires explicit layout.
             public struct IPSEC_POLICY_DATA
             {
                 public Guid PolicyIdentifier;
@@ -32,7 +31,6 @@ namespace IPSecDotNet5
                 public Guid ISAKMPIdentifier;
             }
             
-            //[StructLayout(LayoutKind.Explicit)]
             public struct IPSEC_ISAKMP_DATA
             {
                 public Guid ISAKMPIdentifier;
@@ -86,6 +84,25 @@ namespace IPSecDotNet5
                 public Ipsec.IPSEC_FILTER filter; //IPSEC_FILTER -- missing definition.
                 
             }
+
+            public struct IPSEC_NFA_DATA
+            {
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszIpsecName;
+                public Guid NFAIdentifier;
+                public int dwAuthMethodCount;
+                public IntPtr ppAuthMethods; //PIPSEC_AUTH_METHOD *
+                public int dwInterfaceType;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszInterfaceName;
+                public int dwTunnelIpAddr;
+                public int dwTunnelFlags;
+                public int dwActiveFlag;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszEndPointName;
+                public IntPtr pIpsecFilterData; //PIPSEC_FILTER_DATA
+                public IntPtr pIpsecNegPolData; //PIPSEC_NEGPOL_DATA
+                public int dwWhenChanged;
+                public Guid NegPolIdentifier;
+                public Guid FilterIdentifier;
+            }
         }
         public class Polstore2 : Polstructs
         {
@@ -101,7 +118,9 @@ namespace IPSecDotNet5
             /// <returns></returns>
             [DllImport("polstore", SetLastError = true)]
             protected static extern int IPSecOpenPolicyStore([MarshalAs(UnmanagedType.LPWStr)] string pszMachineName, int dwTypeOfStore, [MarshalAs(UnmanagedType.LPWStr)] string pszFileName, out IntPtr phPolicyStore);
-            
+
+            [DllImport("polstore", SetLastError = true)]
+            protected static extern int IPSecClosePolicyStore(IntPtr hPolicyStore);
             #region IPSecGet
             /// <summary>
             /// 
@@ -148,6 +167,9 @@ namespace IPSecDotNet5
 
             [DllImport("polstore", SetLastError = true)]
             protected static extern int IPSecCreateNegPolData(IntPtr hPolicyStore, IntPtr pIpsecNegPolData);
+
+            [DllImport("polstore", SetLastError = true)]
+            protected static extern int IPSecCreatePolicyData(IntPtr hPolicyStore, IntPtr pIpsecPolicyData);
             #endregion
 
         }
@@ -189,42 +211,42 @@ namespace IPSecDotNet5
         {
             public struct OAKLEY_ALGORITHM
             {
-                uint AlgorithmIdentifier;
-                uint KeySize;
-                uint Rounds;
+                public uint AlgorithmIdentifier;
+                public uint KeySize;
+                public uint Rounds;
             }
             public struct OAKLEY_LIFETIME
             {
-                int KBytes;
-                int Seconds;
+                public int KBytes;
+                public int Seconds;
             }
             public struct CRYPTO_BUNDLE
             {
-                byte MajorVersion;
-                byte MinorVersion;
-                OAKLEY_ALGORITHM EncryptionAlgorithm;
-                OAKLEY_ALGORITHM HashAlgorithm;
-                OAKLEY_ALGORITHM PseudoRandomFunction;  //unused
-                byte AuthenticationMethod;
-                int OakleyGroup;
-                int QuickModeLimit;
-                OAKLEY_LIFETIME Lifetime;
-                bool PfsIdentityRequired;
+                public byte MajorVersion;
+                public byte MinorVersion;
+                public OAKLEY_ALGORITHM EncryptionAlgorithm;
+                public OAKLEY_ALGORITHM HashAlgorithm;
+                public OAKLEY_ALGORITHM PseudoRandomFunction;  //unused
+                public byte AuthenticationMethod;
+                public int OakleyGroup;
+                public int QuickModeLimit;
+                public OAKLEY_LIFETIME Lifetime;
+                public bool PfsIdentityRequired;
             }
             public struct ISAKMP_POLICY
             {
-                Guid PolicyId;
-                bool IdentityProtectionRequired;
-                bool PfsIdentityRequired;
-                int ThreadingFactor;
-                int AquireLimit;
-                int ReceiveLimit;
-                int AquireSize;
-                int ReceiveSize;
-                int RepearInterval;
-                int RpcMaxCalls;
-                int RetryInterval;
-                int RetryLimit;
+                public Guid PolicyId;
+                public bool IdentityProtectionRequired;
+                public bool PfsIdentityRequired;
+                public int ThreadingFactor;
+                public int AquireLimit;
+                public int ReceiveLimit;
+                public int AquireSize;
+                public int ReceiveSize;
+                public int RepearInterval;
+                public int RpcMaxCalls;
+                public int RetryInterval;
+                public int RetryLimit;
             }
         }
         //Justify?

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using static IPSecDotNet5.NativeMethods.Oakdefs;
 namespace IPSecDotNet5
 {
     class FriendlyMethods : NativeMethods.Polstore2
@@ -113,6 +114,14 @@ namespace IPSecDotNet5
             int hr = IPSecCreateFilterData(hStore, pExampleFilterData);
 
             Marshal.FreeHGlobal(pExampleFilterData);
+            return hr;
+        }
+        protected static int IPSecCreateISAKMPData(IntPtr hStore, IPSEC_ISAKMP_DATA ipsecISAKMPData)
+        {
+            IntPtr pIpsecISAKMPData = Marshal.AllocHGlobal(Marshal.SizeOf(ipsecISAKMPData));
+            Marshal.StructureToPtr(ipsecISAKMPData, pIpsecISAKMPData, false);
+            int hr = IPSecCreateISAKMPData(hStore, pIpsecISAKMPData);
+            Marshal.FreeHGlobal(pIpsecISAKMPData);
             return hr;
         }
     }
