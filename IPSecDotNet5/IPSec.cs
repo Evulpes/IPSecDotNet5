@@ -111,7 +111,7 @@ namespace IPSecDotNet5
             }
 
             //Create the 2d pointer and write the struct pointers sequentially next to each other.
-            IntPtr ppFilterSpecs = Marshal.AllocHGlobal(Marshal.SizeOf(IntPtr.Size * ports.Length));
+            IntPtr ppFilterSpecs = Marshal.AllocHGlobal(IntPtr.Size * ports.Length);
             IntPtr ptrCopy = ppFilterSpecs;
             for (int i = 0; i < ports.Length; i++)
             {
