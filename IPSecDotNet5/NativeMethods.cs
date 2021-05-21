@@ -12,6 +12,7 @@ namespace IPSecDotNet5
     {
         public class Polstructs
         {
+            public static readonly Guid GUID_NEGOTIATION_ACTION_BLOCK = new("3f91a819-7647-11d1-864d-d46a00000000");
             public static int IPSEC_REGISTRY_PROVIDER = 0;
             public static int IPSEC_DIRECTORY_PROVIDER = 1;
             public static int IPSEC_FILE_PROVIDER = 2;
@@ -49,6 +50,18 @@ namespace IPSecDotNet5
                 public int dwWhenChanged;
                 [MarshalAs(UnmanagedType.LPWStr)] public string pszIpsecName;
                 [MarshalAs(UnmanagedType.LPWStr)] public string pszIpsecDescription;
+            }
+
+            public struct IPSEC_NEGPOL_DATA
+            {
+                Guid NegPolIdentifier;
+                Guid NegPolAction;
+                Guid NegPolType;
+                int dwSecurityMethodCount;
+                IntPtr pIpsecSecurityMethods; //IPSEC_SECURITY_METHOD *
+                int dwWhenChanged;
+                [MarshalAs(UnmanagedType.LPWStr)]string pszIpsecName;
+                [MarshalAs(UnmanagedType.LPWStr)]string pszDescription;
             }
 
             [StructLayout(LayoutKind.Explicit)]
@@ -127,7 +140,10 @@ namespace IPSecDotNet5
             protected static extern int IPSecGetFilterData(IntPtr hPolicyStore, Guid FilterGUID, IntPtr ppIpsecFilterData);
 
             [DllImport("polstore", SetLastError = true)]
-            public static extern int IPSecCreateFilterData(IntPtr hPolicyStore, IntPtr pIpsecFilterData);
+            protected static extern int IPSecGetNegPolData(IntPtr hPolicyStore, Guid NegPolGuid, IntPtr ppIpsecNegPolData);
+
+            [DllImport("polstore", SetLastError = true)]
+            internal static extern int IPSecCreateFilterData(IntPtr hPolicyStore, IntPtr pIpsecFilterData);
             
             [DllImport("polstore", SetLastError = true)]
             public static extern int IPSecCreateISAKMPData(IntPtr hPolicyStore, IntPtr pIpsecISAKMPData);
@@ -206,6 +222,61 @@ namespace IPSecDotNet5
                 int RpcMaxCalls;
                 int RetryInterval;
                 int RetryLimit;
+            }
+        }
+        //Justify?
+        public static class Winipsec
+        {
+            enum IPSEC_OPERATION
+            {
+                NONE = 0,
+                AUTHENTICATION,
+                ENCRYPTION,
+                COMPRESSION,
+                SA_DELETE
+            }
+            enum HMAC_AH_ALGO
+            {
+                HMAC_AH_NONE = 0,
+                HMAC_AH_MD5,
+                HMAC_AH_SHA1,
+                HMAC_AH_MAX
+            }
+            struct KEY_LIFETIME
+            {
+                int uKeyExpirationTime;
+                int uKeyExpirationKBytes;
+            }
+            struct IPSEC_QM_ALGO
+            {
+                IPSEC_OPERATION Operation;
+                int uAlgoIdentifier;
+                HMAC_AH_ALGO uSecAlgoIdentifier;
+                int uAlgoKeyLen;
+                int uSecAlgoKeyLen;
+                int uAlgoRounds;
+                int MySpi; //IPSEC_QM_SPI (typedef dword)
+                int PeerSpi; //IPSEC_QM_SPI (typedef dword)
+            }
+            /// <summary>
+            /// See Algos comment.
+            /// </summary>
+            struct IPSEC_QM_OFFER
+            {
+                KEY_LIFETIME Lifetime;
+                int dwFlags;
+                bool bPFSRequired;
+                int dwPFSGroup;
+                int dwNumAlgos;
+                IPSEC_QM_ALGO Algos; //must be 2 in size declared.
+            }
+            struct IPSEC_QM_POLICY
+            {
+                Guid gPolicyID;
+                string pszPolicyName;
+                int dwFlags;
+                int dwOfferCount;
+                IntPtr pOffers; //PIPSEC_QM_OFFER
             }
         }
     }

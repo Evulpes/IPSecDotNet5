@@ -43,6 +43,24 @@ namespace IPSecDotNet5
 
             return hr;
         }
+        public static int IPSecGetNegPolData(IntPtr hStore, Guid negGuid, out IPSEC_NEGPOL_DATA ipsecNegPolData)
+        {
+            ipsecNegPolData = new IPSEC_NEGPOL_DATA();
+
+            //Allocate memory for the struct pointer
+            IntPtr ppIpsecNegPolData = Marshal.AllocHGlobal(Marshal.SizeOf(new IntPtr()));
+
+            int hr = IPSecGetNegPolData(hStore, negGuid, ppIpsecNegPolData);
+            if (hr != 0)
+                return hr;
+
+            IntPtr pIpsecNegPolData = Marshal.ReadIntPtr(ppIpsecNegPolData);
+
+            ipsecNegPolData = (IPSEC_NEGPOL_DATA)Marshal.PtrToStructure(pIpsecNegPolData, typeof(IPSEC_NEGPOL_DATA));
+
+            Marshal.FreeHGlobal(ppIpsecNegPolData);
+            return hr;
+        }
         public static int IPSecGetFilterData(IntPtr hStore, Guid filterGuid, out IPSEC_FILTER_DATA ipsecFilterData)
         {
             ipsecFilterData = new IPSEC_FILTER_DATA();
