@@ -1,40 +1,34 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using static IPSecDotNet5.NativeMethods.Polstructs;
 namespace IPSecDotNet5
 {
-    class Program : FriendlyMethods
+    class Program
     {
         static void Main(string[] args)
         {
-            if (IPSecOpenPolicyStore
-            (
-                string.Empty,
-                IPSEC_REGISTRY_PROVIDER,
-                string.Empty,
-                out IntPtr hStore
-            ) != 0)
-                throw new Exception();
-
-
             
+            IPSec ipsec = new();
+            int hr = ipsec.OpenPolicyStore();
+            hr = ipsec.CreateFilterAction("BlockFilter", IPSec.FilterActionType.Block, out IPSEC_NEGPOL_DATA myFilterAction);
             
-            TestUsageExamples.CreateIpSecFilterLists(hStore);
-            TestUsageExamples.CreateFilterAction(hStore);
+            //TestUsageExamples.CreateIpSecFilterLists(hStore);
+            //TestUsageExamples.CreateFilterAction(hStore);
 
-            int hr = IPSecGetAssignedPolicyData(hStore, out IPSEC_POLICY_DATA test);
+            //int hr = IPSecGetAssignedPolicyData(hStore, out IPSEC_POLICY_DATA test);
 
-            if (hr == 0)
-            {
-                
-                _ = IPSecUnassignPolicy(hStore, test.PolicyIdentifier);
-                _ = IPSecAssignPolicy(hStore, test.PolicyIdentifier);
-                _ = IPSecGetISAKMPData(hStore, test.ISAKMPIdentifier, out IPSEC_ISAKMP_DATA isakmpData);
-                _ = IPSecGetFilterData(hStore, new Guid("ef0eedba-1079-4cfd-8b06-5cc6f62e94c0"), out IPSEC_FILTER_DATA ipsecFilterData);
-                _ = IPSecGetFilterSpec(ipsecFilterData.ppFilterSpecs, out IPSEC_FILTER_SPEC filterSpec);
+            //if (hr == 0)
+            //{
 
-                int mememe = 5;
+            //    _ = IPSecUnassignPolicy(hStore, test.PolicyIdentifier);
+            //    _ = IPSecAssignPolicy(hStore, test.PolicyIdentifier);
+            //    _ = IPSecGetISAKMPData(hStore, test.ISAKMPIdentifier, out IPSEC_ISAKMP_DATA isakmpData);
+            //    _ = IPSecGetFilterData(hStore, new Guid("ef0eedba-1079-4cfd-8b06-5cc6f62e94c0"), out IPSEC_FILTER_DATA ipsecFilterData);
+            //    _ = IPSecGetFilterSpec(ipsecFilterData.ppFilterSpecs, out IPSEC_FILTER_SPEC filterSpec);
 
-            }
+            //    int mememe = 5;
+
+            //}
 
         }
     }

@@ -9,7 +9,7 @@ namespace IPSecDotNet5
     class FriendlyMethods : NativeMethods.Polstore2
     {
 
-        public static int IPSecGetAssignedPolicyData(IntPtr hStore, out IPSEC_POLICY_DATA ipsecPolicyData)
+        protected static int IPSecGetAssignedPolicyData(IntPtr hStore, out IPSEC_POLICY_DATA ipsecPolicyData)
         {
             int hr = IPSecGetAssignedPolicyData(hStore, out IntPtr ipsecPolicyDataPtr);
 
@@ -20,7 +20,7 @@ namespace IPSecDotNet5
 
             return hr;
         }
-        public static int IPSecGetISAKMPData(IntPtr hStore, Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecISAKMPData)
+        protected static int IPSecGetISAKMPData(IntPtr hStore, Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecISAKMPData)
         {
             ipsecISAKMPData = new IPSEC_ISAKMP_DATA();
 
@@ -43,25 +43,29 @@ namespace IPSecDotNet5
 
             return hr;
         }
-        public static int IPSecGetNegPolData(IntPtr hStore, Guid negGuid, out IPSEC_NEGPOL_DATA ipsecNegPolData)
+        protected static int IPSecGetNegPolData(IntPtr hStore, Guid negGuid, out IPSEC_NEGPOL_DATA ipsecNegPolData)
         {
             ipsecNegPolData = new IPSEC_NEGPOL_DATA();
 
-            //Allocate memory for the struct pointer
+            //Allocate memory for the struct pointer.
             IntPtr ppIpsecNegPolData = Marshal.AllocHGlobal(Marshal.SizeOf(new IntPtr()));
 
+            //Execute the native import.
             int hr = IPSecGetNegPolData(hStore, negGuid, ppIpsecNegPolData);
             if (hr != 0)
                 return hr;
 
+            //Dereference the double pointer once.
             IntPtr pIpsecNegPolData = Marshal.ReadIntPtr(ppIpsecNegPolData);
 
+            //Marshal the dereferenced pointer to a structure.
             ipsecNegPolData = (IPSEC_NEGPOL_DATA)Marshal.PtrToStructure(pIpsecNegPolData, typeof(IPSEC_NEGPOL_DATA));
 
+            //Free memory.
             Marshal.FreeHGlobal(ppIpsecNegPolData);
             return hr;
         }
-        public static int IPSecGetFilterData(IntPtr hStore, Guid filterGuid, out IPSEC_FILTER_DATA ipsecFilterData)
+        protected static int IPSecGetFilterData(IntPtr hStore, Guid filterGuid, out IPSEC_FILTER_DATA ipsecFilterData)
         {
             ipsecFilterData = new IPSEC_FILTER_DATA();
             
@@ -80,7 +84,7 @@ namespace IPSecDotNet5
             Marshal.FreeHGlobal(ppIpsecFilterData);
             return hr;
         }
-        public static int IPSecGetFilterSpec(IntPtr ppFilterSpecs, out IPSEC_FILTER_SPEC filterSpecs)
+        protected static int IPSecGetFilterSpec(IntPtr ppFilterSpecs, out IPSEC_FILTER_SPEC filterSpecs)
         {
             filterSpecs = new IPSEC_FILTER_SPEC();
             if (ppFilterSpecs == IntPtr.Zero)
@@ -89,7 +93,7 @@ namespace IPSecDotNet5
             filterSpecs = (IPSEC_FILTER_SPEC)Marshal.PtrToStructure(Marshal.ReadIntPtr(ppFilterSpecs), typeof(IPSEC_FILTER_SPEC));
             return 0;
         }
-        public static int IPSecCreateNegPolData(IntPtr hStore, IPSEC_NEGPOL_DATA ipsecNegPolData)
+        protected static int IPSecCreateNegPolData(IntPtr hStore, IPSEC_NEGPOL_DATA ipsecNegPolData)
         {
 
             IntPtr pIpsecNegPolData = Marshal.AllocHGlobal(Marshal.SizeOf(ipsecNegPolData));

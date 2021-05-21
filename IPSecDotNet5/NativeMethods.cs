@@ -100,7 +100,7 @@ namespace IPSecDotNet5
             /// <param name="phPolicyStore"></param>
             /// <returns></returns>
             [DllImport("polstore", SetLastError = true)]
-            public static extern int IPSecOpenPolicyStore([MarshalAs(UnmanagedType.LPWStr)] string pszMachineName, int dwTypeOfStore, [MarshalAs(UnmanagedType.LPWStr)] string pszFileName, out IntPtr phPolicyStore);
+            protected static extern int IPSecOpenPolicyStore([MarshalAs(UnmanagedType.LPWStr)] string pszMachineName, int dwTypeOfStore, [MarshalAs(UnmanagedType.LPWStr)] string pszFileName, out IntPtr phPolicyStore);
             
             #region IPSecGet
             /// <summary>
@@ -128,7 +128,7 @@ namespace IPSecDotNet5
             /// <param name="PolicyGuid"></param>
             /// <returns></returns>
             [DllImport("polstore", SetLastError = true)]
-            public static extern int IPSecUnassignPolicy(IntPtr hPolicyStore, Guid PolicyGuid);
+            protected static extern int IPSecUnassignPolicy(IntPtr hPolicyStore, Guid PolicyGuid);
             /// <summary>
             /// 
             /// </summary>
@@ -136,18 +136,18 @@ namespace IPSecDotNet5
             /// <param name="PolicyGuid"></param>
             /// <returns></returns>
             [DllImport("polstore", SetLastError = true)]
-            public static extern int IPSecAssignPolicy(IntPtr hPolicyStore, Guid PolicyGuid);
+            protected static extern int IPSecAssignPolicy(IntPtr hPolicyStore, Guid PolicyGuid);
 
             #endregion
             #region IPSecCreate
             [DllImport("polstore", SetLastError = true)]
-            internal static extern int IPSecCreateFilterData(IntPtr hPolicyStore, IntPtr pIpsecFilterData);
+            protected static extern int IPSecCreateFilterData(IntPtr hPolicyStore, IntPtr pIpsecFilterData);
 
             [DllImport("polstore", SetLastError = true)]
-            internal static extern int IPSecCreateISAKMPData(IntPtr hPolicyStore, IntPtr pIpsecISAKMPData);
+            protected static extern int IPSecCreateISAKMPData(IntPtr hPolicyStore, IntPtr pIpsecISAKMPData);
 
             [DllImport("polstore", SetLastError = true)]
-            internal static extern int IPSecCreateNegPolData(IntPtr hPolicyStore, IntPtr pIpsecNegPolData);
+            protected static extern int IPSecCreateNegPolData(IntPtr hPolicyStore, IntPtr pIpsecNegPolData);
             #endregion
 
         }
