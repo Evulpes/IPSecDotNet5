@@ -11,6 +11,7 @@ namespace IPSecDotNet5
             IPSec ipsec = new();
             int hr = ipsec.OpenPolicyStore();
             hr = ipsec.CreateFilterAction("BlockFilter", IPSec.FilterActionType.Block, out IPSEC_NEGPOL_DATA myFilterAction);
+            hr = ipsec.CreatePortFilterLists("FilterPorts", new IPSec.Port[] { new IPSec.Port { port = 111, portType = IPSec.PortType.TCP }, new IPSec.Port { port = 222, portType = IPSec.PortType.UDP } }, out IPSEC_FILTER_DATA data);
             
             //TestUsageExamples.CreateIpSecFilterLists(hStore);
             //TestUsageExamples.CreateFilterAction(hStore);

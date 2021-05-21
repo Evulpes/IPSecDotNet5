@@ -100,7 +100,20 @@ namespace IPSecDotNet5
             Marshal.StructureToPtr(ipsecNegPolData, pIpsecNegPolData, false);
 
 
-            return IPSecCreateNegPolData(hStore, pIpsecNegPolData);
+            int hr = IPSecCreateNegPolData(hStore, pIpsecNegPolData);
+
+            Marshal.FreeHGlobal(pIpsecNegPolData);
+            return hr;
+        }
+        protected static int IPSecCreateFilterData(IntPtr hStore, IPSEC_FILTER_DATA ipsecFilterData)
+        {
+            IntPtr pExampleFilterData = Marshal.AllocHGlobal(Marshal.SizeOf(ipsecFilterData));
+            Marshal.StructureToPtr(ipsecFilterData, pExampleFilterData, false);
+
+            int hr = IPSecCreateFilterData(hStore, pExampleFilterData);
+
+            Marshal.FreeHGlobal(pExampleFilterData);
+            return hr;
         }
     }
 }
