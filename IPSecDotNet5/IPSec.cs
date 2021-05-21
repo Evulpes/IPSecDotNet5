@@ -45,14 +45,14 @@ namespace IPSecDotNet5
         }
 
         /// <summary>
-        /// Creates a filterlist with the specified ports.
+        /// Creates a filter with the specified ports.
         /// </summary>
-        /// <param name="name">The name to give the filter list.</param>
-        /// <param name="ports">The ports to use in the filter list.</param>
+        /// <param name="name">The name to give the filter .</param>
+        /// <param name="ports">The ports to use in the filter .</param>
         /// <param name="ipsecFilterData">An out struct to return the data.</param>
-        /// <param name="description">The description to give the filter list.</param>
+        /// <param name="description">The description to give the filter .</param>
         /// <returns>>A WinError System Error Code.</returns>
-        public int CreatePortFilterLists(string name, Port[] ports, out IPSEC_FILTER_DATA ipsecFilterData, string description="")
+        public int CreatePortFilter(string name, Port[] ports, out IPSEC_FILTER_DATA ipsecFilterData, string description="")
         {
             //Initialize.
             ipsecFilterData = new IPSEC_FILTER_DATA()
