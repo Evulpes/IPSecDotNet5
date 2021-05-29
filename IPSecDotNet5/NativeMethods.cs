@@ -84,24 +84,33 @@ namespace IPSecDotNet5
                 public Ipsec.IPSEC_FILTER filter; //IPSEC_FILTER -- missing definition.
                 
             }
-
+            //[StructLayout(LayoutKind.Explicit)]
             public struct IPSEC_NFA_DATA
             {
                 [MarshalAs(UnmanagedType.LPWStr)] public string pszIpsecName;
                 public Guid NFAIdentifier;
                 public int dwAuthMethodCount;
                 public IntPtr ppAuthMethods; //PIPSEC_AUTH_METHOD *
-                public int dwInterfaceType;
+                public int dwInterfaceType; //0xFFFFFFFD, 0xFFFFFFFE, 0xFFFFFFFF = All/LAN/Dial-up
                 [MarshalAs(UnmanagedType.LPWStr)] public string pszInterfaceName;
+                
+                private Guid padding; //Struct has changed since XP. 16 bytes sat in the middle.
+                
                 public int dwTunnelIpAddr;
                 public int dwTunnelFlags;
                 public int dwActiveFlag;
+
                 [MarshalAs(UnmanagedType.LPWStr)] public string pszEndPointName;
                 public IntPtr pIpsecFilterData; //PIPSEC_FILTER_DATA
                 public IntPtr pIpsecNegPolData; //PIPSEC_NEGPOL_DATA
+    
+
                 public int dwWhenChanged;
+
                 public Guid NegPolIdentifier;
+
                 public Guid FilterIdentifier;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszDescription;
             }
         }
         public class Polstore2 : Polstructs

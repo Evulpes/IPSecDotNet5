@@ -7,24 +7,40 @@ namespace IPSecDotNet5
     {
         static void Main(string[] args)
         {
-            
+            bool runCreate = false;
+
             IPSec ipsec = new();
             int hr = ipsec.OpenPolicyStore();
 
 
-            //Console.WriteLine("CreateFilterAction");
-            //hr = ipsec.CreateFilterAction("BlockFilter", IPSec.FilterActionType.Block, out IPSEC_NEGPOL_DATA myFilterAction);
+            if (runCreate)
+            {
+                Console.WriteLine("CreateFilterAction");
+                hr = ipsec.CreateFilterAction("BlockFilter", IPSec.FilterActionType.Block, out IPSEC_NEGPOL_DATA myFilterAction);
+                Console.WriteLine("CreateFilterList");
+                hr = ipsec.CreatePortFilter("FilterPorts", new IPSec.Port[] { new IPSec.Port { port = 111, portType = IPSec.PortType.TCP }, new IPSec.Port { port = 222, portType = IPSec.PortType.TCP } }, out IPSEC_FILTER_DATA ipsecFilterData);
 
-            //Console.WriteLine("CreateFilterList");
-            //hr = ipsec.CreatePortFilterLists("FilterPorts", new IPSec.Port[] { new IPSec.Port { port = 111, portType = IPSec.PortType.TCP }, new IPSec.Port { port = 222, portType = IPSec.PortType.TCP } }, out IPSEC_FILTER_DATA data);
+                IPSEC_NFA_DATA nfaData = new()
+                {
+                    NFAIdentifier = Guid.NewGuid(),
+                    dwAuthMethodCount = 1,
+
+                };
+
+            }
+
+            ipsec.GetPolicyNFAData(new Guid("d374cbcd-0139-49f7-a74a-bc12cd84014a"), out IPSEC_NFA_DATA testData, out int testCount);
 
 
             hr = ipsec.GetAssignedPolicyData(out IPSEC_POLICY_DATA data);
             hr = ipsec.GetISAKMPData(data.ISAKMPIdentifier, out IPSEC_ISAKMP_DATA isakmpdata);
             hr = ipsec.GetSecurityMethods(isakmpdata.pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE bundle);
+            
 
+            ipsec.GetPolicyNFAData(data.PolicyIdentifier, out IPSEC_NFA_DATA ipsecNfaData, out int numNfaObjects);
+            #region testing
 
-            ipsec.GetPolicyNFAData(data.PolicyIdentifier, out IPSEC_NFA_DATA ipsecNfaData);
+            #endregion
 
             //Internalise?
             hr = ipsec.CreateIpsecSakmpData();

@@ -186,11 +186,12 @@ namespace IPSecDotNet5
         public int GetISAKMPData(Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecIsakmpData)=> IPSecGetISAKMPData(hStore, ISAKMPGUID, out ipsecIsakmpData);
         public int GetSecurityMethods(IntPtr pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE securityMethods)
         {
+            //Try ~Catch manage? Need to test overall.
             securityMethods = (NativeMethods.Oakdefs.CRYPTO_BUNDLE)Marshal.PtrToStructure(pSecurityMethods, typeof(NativeMethods.Oakdefs.CRYPTO_BUNDLE));
             return 0;
         }
         
-        public int GetPolicyNFAData(Guid policyGuid, out IPSEC_NFA_DATA ipsecNfaData) => IPSecEnumNFAData(hStore, policyGuid, out ipsecNfaData);
+        public int GetPolicyNFAData(Guid policyGuid, out IPSEC_NFA_DATA ipsecNfaData, out int numNfaObjects) => IPSecEnumNFAData(hStore, policyGuid, out ipsecNfaData, out numNfaObjects);
         
         
         public enum FilterActionType
