@@ -157,5 +157,13 @@ namespace IPSecDotNet5
 
             return hr;
         }
+        protected static int IPSecCreatePolicyData(IntPtr hStore, IPSEC_POLICY_DATA ipsecPolicyData)
+        {
+            IntPtr pIpsecPolicyData = Marshal.AllocHGlobal(Marshal.SizeOf(ipsecPolicyData));
+            Marshal.StructureToPtr(ipsecPolicyData, pIpsecPolicyData, false);
+            int hr = IPSecCreatePolicyData(hStore, pIpsecPolicyData);
+            Marshal.FreeHGlobal(pIpsecPolicyData);
+            return hr;
+        }
     }
 }

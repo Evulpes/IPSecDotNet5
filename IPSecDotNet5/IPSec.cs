@@ -17,6 +17,8 @@ namespace IPSecDotNet5
             _ = OpenPolicyStore();
         }
 
+        public int AssignPolicy(Guid policyIdentifier) => FriendlyMethods.IPSecAssignPolicy(hStore, policyIdentifier);
+        public int UnassignPolicy(Guid policyIdentifier) => IPSecUnassignPolicy(hStore, policyIdentifier);
         /// <summary>
         /// Creates a standalone filter action.
         /// </summary>
@@ -43,7 +45,6 @@ namespace IPSecDotNet5
             
             return IPSecCreateNegPolData(hStore, ipsecNegPol);
         }
-
         /// <summary>
         /// Creates a filter with the specified ports.
         /// </summary>
@@ -132,10 +133,13 @@ namespace IPSecDotNet5
             Marshal.FreeHGlobal(ppFilterSpecs);
             return hr;
         }
-
         public int CreateRule(Guid policyIdentifier, IPSEC_NFA_DATA ipsecNFAData) => IPSecCreateNFAData(hStore, policyIdentifier, ipsecNFAData);
-
-        public int CreateIpsecSakmpData()
+        public int CreatePolicy(IPSEC_POLICY_DATA ipsecPolicyData)
+        {    
+            int hr = IPSecCreatePolicyData(hStore, ipsecPolicyData);
+            return hr;
+        }
+        public int CreateIpsecSakmpData(out IPSEC_ISAKMP_DATA manualISAKMPData)
         {
             NativeMethods.Oakdefs.CRYPTO_BUNDLE pSecurityMethods = new()
             {
@@ -143,7 +147,7 @@ namespace IPSecDotNet5
                 HashAlgorithm = new NativeMethods.Oakdefs.OAKLEY_ALGORITHM() { AlgorithmIdentifier = 2, Rounds = 0, KeySize = 64 },
                 Lifetime = new NativeMethods.Oakdefs.OAKLEY_LIFETIME() { KBytes = 0, Seconds = 28800 },
             };
-            IPSEC_ISAKMP_DATA manualISAKMPData = new()
+            manualISAKMPData = new IPSEC_ISAKMP_DATA()
             {
                 ISAKMPIdentifier = Guid.NewGuid(),
                 dwWhenChanged = (int)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
@@ -163,7 +167,6 @@ namespace IPSecDotNet5
 
             return hr;
         } 
-
         /// <summary>
         /// Opens a handle to the policy store.
         /// </summary>
@@ -183,7 +186,6 @@ namespace IPSecDotNet5
         /// </summary>
         /// <returns>>A WinError System Error Code.</returns>
         public int ClosePolicyStore() => IPSecClosePolicyStore(hStore);
-
         public int GetAssignedPolicyData(out IPSEC_POLICY_DATA assignedPolicyData) => IPSecGetAssignedPolicyData(hStore, out  assignedPolicyData);
         public int GetISAKMPData(Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecIsakmpData)=> IPSecGetISAKMPData(hStore, ISAKMPGUID, out ipsecIsakmpData);
         public int GetSecurityMethods(IntPtr pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE securityMethods)
@@ -191,11 +193,9 @@ namespace IPSecDotNet5
             //Try ~Catch manage? Need to test overall.
             securityMethods = (NativeMethods.Oakdefs.CRYPTO_BUNDLE)Marshal.PtrToStructure(pSecurityMethods, typeof(NativeMethods.Oakdefs.CRYPTO_BUNDLE));
             return 0;
-        }
-        
+        } 
         public int GetPolicyNFAData(Guid policyGuid, out IPSEC_NFA_DATA ipsecNfaData, out int numNfaObjects) => IPSecEnumNFAData(hStore, policyGuid, out ipsecNfaData, out numNfaObjects);
-        
-        
+         
         public enum FilterActionType
         {
             Allow,
