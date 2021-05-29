@@ -112,6 +112,14 @@ namespace IPSecDotNet5
                 public Guid FilterIdentifier;
                 [MarshalAs(UnmanagedType.LPWStr)] public string pszDescription;
             }
+            public struct IPSEC_AUTH_METHOD
+            {
+                public int dwAuthType; //0x1 = PSK, 0x3 = x.509 Cert, 0x5 = Kerberos auth.
+                public int dwAuthLen;
+                [MarshalAs(UnmanagedType.LPWStr)] public string pszAuthMethod;
+                public int dwAltAuthLen;
+                IntPtr pAltAuthMethod;  //pbyte
+            }
         }
         public class Polstore2 : Polstructs
         {
@@ -179,6 +187,9 @@ namespace IPSecDotNet5
 
             [DllImport("polstore", SetLastError = true)]
             protected static extern int IPSecCreatePolicyData(IntPtr hPolicyStore, IntPtr pIpsecPolicyData);
+
+            [DllImport("polstore", SetLastError = true)]
+            protected static extern int IPSecCreateNFAData(IntPtr hPolicyStore, Guid PolicyIdentifier, IntPtr pIpsecNFAData);
             #endregion
             #region IPSecEnum
             [DllImport("polstore", SetLastError = true)]

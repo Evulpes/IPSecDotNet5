@@ -7,7 +7,7 @@ namespace IPSecDotNet5
     {
         static void Main(string[] args)
         {
-            bool runCreate = false;
+            bool runCreate = true;
 
             IPSec ipsec = new();
             int hr = ipsec.OpenPolicyStore();
@@ -20,27 +20,41 @@ namespace IPSecDotNet5
                 Console.WriteLine("CreateFilterList");
                 hr = ipsec.CreatePortFilter("FilterPorts", new IPSec.Port[] { new IPSec.Port { port = 111, portType = IPSec.PortType.TCP }, new IPSec.Port { port = 222, portType = IPSec.PortType.TCP } }, out IPSEC_FILTER_DATA ipsecFilterData);
 
+                IPSEC_AUTH_METHOD ipsecAuthMethod = new()
+                {
+                    dwAuthType = 0x5
+                };
+                IntPtr pAuthMethods = Marshal.AllocHGlobal(Marshal.SizeOf(ipsecAuthMethod));
+                IntPtr ppAuthMethods = Marshal.AllocHGlobal(IntPtr.Size);
+                Marshal.WriteIntPtr(ppAuthMethods, pAuthMethods);
+                Marshal.StructureToPtr(ipsecAuthMethod, pAuthMethods, false);
+
+
                 IPSEC_NFA_DATA nfaData = new()
                 {
+                    pszIpsecName = "Example Rule",
+                    pszDescription = "Example Rule Description",
+                    pszInterfaceName = null,
+                    pszEndPointName = null,
                     NFAIdentifier = Guid.NewGuid(),
+                    pIpsecFilterData = new(),
+                    FilterIdentifier = default,
+                    NegPolIdentifier = myFilterAction.NegPolIdentifier,
+                    dwTunnelFlags = 0,
+                    dwInterfaceType = unchecked(0xfffffd),
+                    dwActiveFlag = 1,
                     dwAuthMethodCount = 1,
-
+                    ppAuthMethods = ppAuthMethods,
+                    dwWhenChanged = (int)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
                 };
-
+                hr = ipsec.CreateRule(new Guid("2ad0e328-7fa8-41a4-a42a-25eec476178b"), nfaData);
             }
-
-            ipsec.GetPolicyNFAData(new Guid("d374cbcd-0139-49f7-a74a-bc12cd84014a"), out IPSEC_NFA_DATA testData, out int testCount);
-
 
             hr = ipsec.GetAssignedPolicyData(out IPSEC_POLICY_DATA data);
             hr = ipsec.GetISAKMPData(data.ISAKMPIdentifier, out IPSEC_ISAKMP_DATA isakmpdata);
             hr = ipsec.GetSecurityMethods(isakmpdata.pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE bundle);
-            
-
-            ipsec.GetPolicyNFAData(data.PolicyIdentifier, out IPSEC_NFA_DATA ipsecNfaData, out int numNfaObjects);
-            #region testing
-
-            #endregion
+            hr = ipsec.GetPolicyNFAData(data.PolicyIdentifier, out IPSEC_NFA_DATA ipsecNfaData, out int numNfaObjects);
+            IPSEC_AUTH_METHOD temp = (IPSEC_AUTH_METHOD)Marshal.PtrToStructure(Marshal.ReadIntPtr(ipsecNfaData.ppAuthMethods), typeof(IPSEC_AUTH_METHOD));
 
             //Internalise?
             hr = ipsec.CreateIpsecSakmpData();

@@ -133,6 +133,8 @@ namespace IPSecDotNet5
             return hr;
         }
 
+        public int CreateRule(Guid policyIdentifier, IPSEC_NFA_DATA ipsecNFAData) => IPSecCreateNFAData(hStore, policyIdentifier, ipsecNFAData);
+
         public int CreateIpsecSakmpData()
         {
             NativeMethods.Oakdefs.CRYPTO_BUNDLE pSecurityMethods = new()

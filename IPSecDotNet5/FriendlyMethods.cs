@@ -124,13 +124,27 @@ namespace IPSecDotNet5
             Marshal.FreeHGlobal(pIpsecISAKMPData);
             return hr;
         }
+        protected static int IPSecCreateNFAData(IntPtr hStore, Guid PolicyIdentifer, IPSEC_NFA_DATA ipsecNFAData)
+        {
+
+            IntPtr pIpsecNFAData = Marshal.AllocHGlobal(Marshal.SizeOf(new IPSEC_NFA_DATA())+0x50);
+            Marshal.StructureToPtr(ipsecNFAData, pIpsecNFAData, false);
+            int hr = IPSecCreateNFAData(hStore, PolicyIdentifer, pIpsecNFAData);
+            
+            Marshal.FreeHGlobal(pIpsecNFAData);
+            return hr;
+        }
         protected static int IPSecEnumNFAData(IntPtr hStore, Guid PolicyIdentifer, out IPSEC_NFA_DATA ipsecNfaData, out int numNfaObjects)
         {
+            ipsecNfaData = new();
+            numNfaObjects = -1;
 
             IntPtr pppIpsecNFAdata = Marshal.AllocHGlobal(IntPtr.Size);
             IntPtr pNumNFAObjects = Marshal.AllocHGlobal(Marshal.SizeOf(new int()));
 
             int hr = IPSecEnumNFAData(hStore, PolicyIdentifer, pppIpsecNFAdata, pNumNFAObjects);
+            if (hr != 0)
+                return hr;
 
             IntPtr ppIpsecNFAdata = Marshal.ReadIntPtr(pppIpsecNFAdata);
             IntPtr pIpsecNFAdata = Marshal.ReadIntPtr(ppIpsecNFAdata);
@@ -139,7 +153,8 @@ namespace IPSecDotNet5
             numNfaObjects = Marshal.ReadInt32(pNumNFAObjects);
 
             Marshal.FreeHGlobal(pppIpsecNFAdata);
-            
+            Marshal.FreeHGlobal(pNumNFAObjects);
+
             return hr;
         }
     }
