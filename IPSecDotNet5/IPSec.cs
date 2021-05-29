@@ -11,14 +11,114 @@ namespace IPSecDotNet5
     {
         private IntPtr hStore;
         private bool disposedValue;
+        private Guid policyId;
 
         public IPSec()
         {
             _ = OpenPolicyStore();
         }
 
-        public int AssignPolicy(Guid policyIdentifier) => FriendlyMethods.IPSecAssignPolicy(hStore, policyIdentifier);
-        public int UnassignPolicy(Guid policyIdentifier) => IPSecUnassignPolicy(hStore, policyIdentifier);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ports"></param>
+        /// <returns></returns>
+        public int ArmPorts(Port[] ports)
+        {
+            if (hStore == IntPtr.Zero)
+                return 0x6; // ERROR_INVALID_HANDLE
+
+            int hresult = IPSecGetAssignedPolicyData(hStore, out IPSEC_POLICY_DATA ipsecPolicyData);
+            if (hresult == 0)
+            {
+                throw new NotImplementedException("ToDo: Add IPSecEnumPolicyData and deletion");
+            }
+
+
+            hresult = CreateIpsecSakmpData(out IPSEC_ISAKMP_DATA ipsecIsakmpData);
+            if (hresult != 0)
+                return hresult;
+
+            IPSEC_POLICY_DATA policyData = new()
+            {
+                pszIpsecName = "IPSecDotNet5 Policy",
+                pszDescription = "https://github.com/Evulpes/IPSecDotNet5/",
+                PolicyIdentifier = Guid.NewGuid(),
+                pIpsecISAKMPData = IntPtr.Zero,
+                ppIpsecNFAData = IntPtr.Zero,
+                dwNumNFACount = 0,
+                dwWhenChanged = 0,
+                dwPollingInterval = 0,
+                ISAKMPIdentifier = ipsecIsakmpData.ISAKMPIdentifier,
+            };
+
+            hresult = CreatePolicy(policyData);
+            if (hresult != 0)
+                return hresult;
+
+            policyId = policyData.PolicyIdentifier;
+
+            hresult = CreateFilterAction("IPSecDotNet5 Filter Action", FilterActionType.Block, out IPSEC_NEGPOL_DATA filterAction);
+            if (hresult != 0)
+                return hresult;
+
+            hresult = CreatePortFilter("IPSecDotNet5 Filter List", ports, out IPSEC_FILTER_DATA filterData);
+            if (hresult != 0)
+                return hresult;
+
+            IPSEC_AUTH_METHOD ipsecAuthMethod = new()
+            {
+                dwAuthType = 0x5
+            };
+            IntPtr pAuthMethods = Marshal.AllocHGlobal(Marshal.SizeOf(ipsecAuthMethod)); 
+            IntPtr ppAuthMethods = Marshal.AllocHGlobal(IntPtr.Size);                    
+            Marshal.WriteIntPtr(ppAuthMethods, pAuthMethods);
+            Marshal.StructureToPtr(ipsecAuthMethod, pAuthMethods, false);
+            IPSEC_NFA_DATA nfaData = new()
+            {
+                pszIpsecName = "IPSecDotNet5 Rule",
+                pszDescription = "https://github.com/Evulpes/IPSecDotNet5/",
+                pszInterfaceName = null,
+                pszEndPointName = null,
+                NFAIdentifier = Guid.NewGuid(),
+                pIpsecFilterData = new(),
+                FilterIdentifier = filterData.FilterIdentifier,
+                NegPolIdentifier = filterAction.NegPolIdentifier,
+                dwTunnelFlags = 0,
+                dwInterfaceType = (uint)InterfaceType.All,
+                dwActiveFlag = 1,
+                dwAuthMethodCount = 1,
+                ppAuthMethods = ppAuthMethods,
+                dwWhenChanged = (int)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
+            };
+
+            hresult = CreateRule(policyData.PolicyIdentifier, nfaData);
+
+            Marshal.FreeHGlobal(ppAuthMethods);
+            Marshal.FreeHGlobal(pAuthMethods);
+
+            return hresult;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public int UnblockPorts() => UnassignPolicy(policyId);
+        public int BlockPorts() => AssignPolicy(policyId);
+
+        /// <summary>
+        /// Assigns the specified policy to the engine.
+        /// </summary>
+        /// <param name="policyIdentifier">The GUID of the policy to assign.</param>
+        /// <returns>A WinError System Error Code.</returns>
+        private int AssignPolicy(Guid policyIdentifier) => IPSecAssignPolicy(hStore, policyIdentifier);
+        /// <summary>
+        /// Unassigns the specified policy from the engine.
+        /// </summary>
+        /// <param name="policyIdentifier">The GUID of the policy to unassign.</param>
+        /// <returns>A WinError System Error Code.</returns>
+        private int UnassignPolicy(Guid policyIdentifier) => IPSecUnassignPolicy(hStore, policyIdentifier);
         /// <summary>
         /// Creates a standalone filter action.
         /// </summary>
@@ -28,7 +128,7 @@ namespace IPSecDotNet5
         /// <param name="ipsecNegPol">An out struct to return the data.</param>
         /// <param name="description">The description to give the filter action.</param>
         /// <returns>A WinError System Error Code.</returns>
-        public int CreateFilterAction(string name, FilterActionType action, out IPSEC_NEGPOL_DATA ipsecNegPol, string description="")
+        private int CreateFilterAction(string name, FilterActionType action, out IPSEC_NEGPOL_DATA ipsecNegPol, string description="")
         {
             ipsecNegPol = new IPSEC_NEGPOL_DATA()
             {
@@ -53,7 +153,7 @@ namespace IPSecDotNet5
         /// <param name="ipsecFilterData">An out struct to return the data.</param>
         /// <param name="description">The description to give the filter .</param>
         /// <returns>>A WinError System Error Code.</returns>
-        public int CreatePortFilter(string name, Port[] ports, out IPSEC_FILTER_DATA ipsecFilterData, string description="")
+        private int CreatePortFilter(string name, Port[] ports, out IPSEC_FILTER_DATA ipsecFilterData, string description="")
         {
             //Initialize.
             ipsecFilterData = new IPSEC_FILTER_DATA()
@@ -133,13 +233,29 @@ namespace IPSecDotNet5
             Marshal.FreeHGlobal(ppFilterSpecs);
             return hr;
         }
-        public int CreateRule(Guid policyIdentifier, IPSEC_NFA_DATA ipsecNFAData) => IPSecCreateNFAData(hStore, policyIdentifier, ipsecNFAData);
-        public int CreatePolicy(IPSEC_POLICY_DATA ipsecPolicyData)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="policyIdentifier"></param>
+        /// <param name="ipsecNFAData"></param>
+        /// <returns></returns>
+        private int CreateRule(Guid policyIdentifier, IPSEC_NFA_DATA ipsecNFAData) => IPSecCreateNFAData(hStore, policyIdentifier, ipsecNFAData);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ipsecPolicyData"></param>
+        /// <returns></returns>
+        private int CreatePolicy(IPSEC_POLICY_DATA ipsecPolicyData)
         {    
             int hr = IPSecCreatePolicyData(hStore, ipsecPolicyData);
             return hr;
         }
-        public int CreateIpsecSakmpData(out IPSEC_ISAKMP_DATA manualISAKMPData)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="manualISAKMPData"></param>
+        /// <returns></returns>
+        private int CreateIpsecSakmpData(out IPSEC_ISAKMP_DATA manualISAKMPData)
         {
             NativeMethods.Oakdefs.CRYPTO_BUNDLE pSecurityMethods = new()
             {
@@ -166,12 +282,12 @@ namespace IPSecDotNet5
             Marshal.FreeHGlobal(manualISAKMPData.pSecurityMethods);
 
             return hr;
-        } 
+        }
         /// <summary>
         /// Opens a handle to the policy store.
         /// </summary>
         /// <returns>A WinError System Error Code.</returns>
-        public int OpenPolicyStore()
+        private int OpenPolicyStore()
         {
             return IPSecOpenPolicyStore
             (
@@ -185,16 +301,40 @@ namespace IPSecDotNet5
         /// Closes a handle to the policy store.
         /// </summary>
         /// <returns>>A WinError System Error Code.</returns>
-        public int ClosePolicyStore() => IPSecClosePolicyStore(hStore);
-        public int GetAssignedPolicyData(out IPSEC_POLICY_DATA assignedPolicyData) => IPSecGetAssignedPolicyData(hStore, out  assignedPolicyData);
-        public int GetISAKMPData(Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecIsakmpData)=> IPSecGetISAKMPData(hStore, ISAKMPGUID, out ipsecIsakmpData);
-        public int GetSecurityMethods(IntPtr pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE securityMethods)
+        private int ClosePolicyStore() => IPSecClosePolicyStore(hStore);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assignedPolicyData"></param>
+        /// <returns></returns>
+        private int GetAssignedPolicyData(out IPSEC_POLICY_DATA assignedPolicyData) => IPSecGetAssignedPolicyData(hStore, out  assignedPolicyData);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ISAKMPGUID"></param>
+        /// <param name="ipsecIsakmpData"></param>
+        /// <returns></returns>
+        private int GetISAKMPData(Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecIsakmpData)=> IPSecGetISAKMPData(hStore, ISAKMPGUID, out ipsecIsakmpData);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pSecurityMethods"></param>
+        /// <param name="securityMethods"></param>
+        /// <returns></returns>
+        private int GetSecurityMethods(IntPtr pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE securityMethods)
         {
             //Try ~Catch manage? Need to test overall.
             securityMethods = (NativeMethods.Oakdefs.CRYPTO_BUNDLE)Marshal.PtrToStructure(pSecurityMethods, typeof(NativeMethods.Oakdefs.CRYPTO_BUNDLE));
             return 0;
-        } 
-        public int GetPolicyNFAData(Guid policyGuid, out IPSEC_NFA_DATA ipsecNfaData, out int numNfaObjects) => IPSecEnumNFAData(hStore, policyGuid, out ipsecNfaData, out numNfaObjects);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="policyGuid"></param>
+        /// <param name="ipsecNfaData"></param>
+        /// <param name="numNfaObjects"></param>
+        /// <returns></returns>
+        private int GetPolicyNFAData(Guid policyGuid, out IPSEC_NFA_DATA ipsecNfaData, out int numNfaObjects) => IPSecEnumNFAData(hStore, policyGuid, out ipsecNfaData, out numNfaObjects);
          
         public enum FilterActionType
         {
@@ -206,12 +346,24 @@ namespace IPSecDotNet5
             public ushort port;
             public PortType portType;
         }
+        /// <summary>
+        /// Used for <see cref="Port.portType"/>.
+        /// </summary>
         public enum PortType
         {
             TCP = 0x6,
             UDP = 0x11
         }
-        #region dispose
+        /// <summary>
+        /// Used for <see cref="NativeMethods.Polstructs.IPSEC_NFA_DATA.dwInterfaceType"/>.
+        /// </summary>
+        public enum InterfaceType : uint
+        {
+            dialup = 0xFFFFFFFF,
+            LAN = 0xFFFFFFFE,
+            All = 0xFFFFFFFD,
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -222,7 +374,6 @@ namespace IPSecDotNet5
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-
                 // TODO: set large fields to null
                 disposedValue = true;
             }
@@ -241,7 +392,6 @@ namespace IPSecDotNet5
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-        #endregion
     }
 
 }

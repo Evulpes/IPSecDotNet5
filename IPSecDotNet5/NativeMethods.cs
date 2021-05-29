@@ -91,7 +91,7 @@ namespace IPSecDotNet5
                 public Guid NFAIdentifier;
                 public int dwAuthMethodCount;
                 public IntPtr ppAuthMethods; //PIPSEC_AUTH_METHOD *
-                public int dwInterfaceType; //0xFFFFFFFD, 0xFFFFFFFE, 0xFFFFFFFF = All/LAN/Dial-up
+                public uint dwInterfaceType; //0xFFFFFFFD, 0xFFFFFFFE, 0xFFFFFFFF = All/LAN/Dial-up
                 [MarshalAs(UnmanagedType.LPWStr)] public string pszInterfaceName;
                 
                 private Guid padding; //Struct has changed since XP. 16 bytes sat in the middle.
