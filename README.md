@@ -14,3 +14,5 @@
     ipsec.CreateFilterAction("ExampleFilterAction", IPSec.FilterActionType.Block, out IPSEC_NEGPOL_DATA myFilterAction);
     netsh ipsec static add rule name=ExampleRule policy=ExamplePolicy filterlist=ExampleFilterList filteraction=ExampleFilterAction
     netsh ipsec static set policy ExamplePolicy assign=y
+
+https://winprotocoldoc.blob.core.windows.net/productionwindowsarchives/MS-GPIPSEC/%5BMS-GPIPSEC%5D.pdf
