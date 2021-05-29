@@ -133,11 +133,34 @@ namespace IPSecDotNet5
             return hr;
         }
 
-        public int TEMP_CREATEIPSECSAKMPDATA(IPSEC_ISAKMP_DATA data)
+        public int CreateIpsecSakmpData()
         {
-            int hr = FriendlyMethods.IPSecCreateISAKMPData(hStore, data);
+            NativeMethods.Oakdefs.CRYPTO_BUNDLE pSecurityMethods = new()
+            {
+                EncryptionAlgorithm = new NativeMethods.Oakdefs.OAKLEY_ALGORITHM() { AlgorithmIdentifier = 3, Rounds = 8, KeySize = 64 },
+                HashAlgorithm = new NativeMethods.Oakdefs.OAKLEY_ALGORITHM() { AlgorithmIdentifier = 2, Rounds = 0, KeySize = 64 },
+                Lifetime = new NativeMethods.Oakdefs.OAKLEY_LIFETIME() { KBytes = 0, Seconds = 28800 },
+            };
+            IPSEC_ISAKMP_DATA manualISAKMPData = new()
+            {
+                ISAKMPIdentifier = Guid.NewGuid(),
+                dwWhenChanged = (int)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
+                dwNumISAKMPSecurityMethods = 2,
+                pSecurityMethods = Marshal.AllocHGlobal(Marshal.SizeOf(pSecurityMethods)),
+            };
+            manualISAKMPData.ISAKMPPolicy = new NativeMethods.Oakdefs.ISAKMP_POLICY()
+            {
+                AquireSize = 28800,
+                PolicyId = manualISAKMPData.ISAKMPIdentifier
+            };
+            Marshal.StructureToPtr(pSecurityMethods, manualISAKMPData.pSecurityMethods, false);
+        
+            int hr = IPSecCreateISAKMPData(hStore, manualISAKMPData);
+
+            Marshal.FreeHGlobal(manualISAKMPData.pSecurityMethods);
+
             return hr;
-        }
+        } 
 
         /// <summary>
         /// Opens a handle to the policy store.
@@ -153,25 +176,22 @@ namespace IPSecDotNet5
                 out hStore
             );
         }
-
-        public int GetAssignedPolicyData(out IPSEC_POLICY_DATA assignedPolicyData) => IPSecGetAssignedPolicyData(hStore, out  assignedPolicyData);
-
-        public int GetISAKMPData(Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecIsakmpData)=> IPSecGetISAKMPData(hStore, ISAKMPGUID, out ipsecIsakmpData);
-
-        public int GetSecurityMethods(IntPtr pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE securityMethods)
-        {
-            securityMethods = (NativeMethods.Oakdefs.CRYPTO_BUNDLE)Marshal.PtrToStructure(pSecurityMethods, typeof(NativeMethods.Oakdefs.CRYPTO_BUNDLE));
-
-
-            return 0;
-        }
-        
         /// <summary>
         /// Closes a handle to the policy store.
         /// </summary>
         /// <returns>>A WinError System Error Code.</returns>
         public int ClosePolicyStore() => IPSecClosePolicyStore(hStore);
 
+        public int GetAssignedPolicyData(out IPSEC_POLICY_DATA assignedPolicyData) => IPSecGetAssignedPolicyData(hStore, out  assignedPolicyData);
+        public int GetISAKMPData(Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecIsakmpData)=> IPSecGetISAKMPData(hStore, ISAKMPGUID, out ipsecIsakmpData);
+        public int GetSecurityMethods(IntPtr pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE securityMethods)
+        {
+            securityMethods = (NativeMethods.Oakdefs.CRYPTO_BUNDLE)Marshal.PtrToStructure(pSecurityMethods, typeof(NativeMethods.Oakdefs.CRYPTO_BUNDLE));
+            return 0;
+        }
+        
+        public int GetPolicyNFAData(Guid policyGuid, out IPSEC_NFA_DATA ipsecNfaData) => IPSecEnumNFAData(hStore, policyGuid, out ipsecNfaData);
+        
         
         public enum FilterActionType
         {

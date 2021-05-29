@@ -22,32 +22,12 @@ namespace IPSecDotNet5
             hr = ipsec.GetAssignedPolicyData(out IPSEC_POLICY_DATA data);
             hr = ipsec.GetISAKMPData(data.ISAKMPIdentifier, out IPSEC_ISAKMP_DATA isakmpdata);
             hr = ipsec.GetSecurityMethods(isakmpdata.pSecurityMethods, out NativeMethods.Oakdefs.CRYPTO_BUNDLE bundle);
-            int temp = 0;
 
 
-            NativeMethods.Oakdefs.CRYPTO_BUNDLE pSecurityMethods = new NativeMethods.Oakdefs.CRYPTO_BUNDLE()
-            {
-                EncryptionAlgorithm = new NativeMethods.Oakdefs.OAKLEY_ALGORITHM() { AlgorithmIdentifier = 3, Rounds = 8, KeySize = 64 },
-                HashAlgorithm = new NativeMethods.Oakdefs.OAKLEY_ALGORITHM() {AlgorithmIdentifier = 2, Rounds = 0, KeySize =  64},
-                Lifetime = new NativeMethods.Oakdefs.OAKLEY_LIFETIME() { KBytes = 0, Seconds = 28800 },
-            };
+            ipsec.GetPolicyNFAData(data.PolicyIdentifier, out IPSEC_NFA_DATA ipsecNfaData);
 
-            IPSEC_ISAKMP_DATA manualISAKMPData = new IPSEC_ISAKMP_DATA()
-            {
-                ISAKMPIdentifier = Guid.NewGuid(),
-                dwWhenChanged = (int)new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(),
-                dwNumISAKMPSecurityMethods = 2,
-                pSecurityMethods = Marshal.AllocHGlobal(Marshal.SizeOf(pSecurityMethods)),
-            };
-            manualISAKMPData.ISAKMPPolicy = new NativeMethods.Oakdefs.ISAKMP_POLICY()
-            {
-                AquireSize = 28800,
-                PolicyId = manualISAKMPData.ISAKMPIdentifier
-                
-            };
-            Marshal.StructureToPtr(pSecurityMethods, manualISAKMPData.pSecurityMethods, false);
-
-            int meme = ipsec.TEMP_CREATEIPSECSAKMPDATA(manualISAKMPData);
+            //Internalise?
+            hr = ipsec.CreateIpsecSakmpData();
 
 
 

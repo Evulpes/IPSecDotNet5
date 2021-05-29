@@ -124,5 +124,21 @@ namespace IPSecDotNet5
             Marshal.FreeHGlobal(pIpsecISAKMPData);
             return hr;
         }
+        protected static int IPSecEnumNFAData(IntPtr hStore, Guid PolicyIdentifer, out IPSEC_NFA_DATA ipsecNfaData)
+        {
+
+            IntPtr pppIpsecNFAdata = Marshal.AllocHGlobal(IntPtr.Size);
+            IntPtr numNFAObjects = Marshal.AllocHGlobal(Marshal.SizeOf(new int()));
+
+            int hr = IPSecEnumNFAData(hStore, PolicyIdentifer, pppIpsecNFAdata, numNFAObjects);
+
+            IntPtr ppIpsecNFAdata = Marshal.ReadIntPtr(pppIpsecNFAdata);
+            IntPtr pIpsecNFAdata = Marshal.ReadIntPtr(ppIpsecNFAdata);
+
+            ipsecNfaData = (IPSEC_NFA_DATA)Marshal.PtrToStructure(pIpsecNFAdata, typeof(IPSEC_NFA_DATA));
+
+            Marshal.FreeHGlobal(pppIpsecNFAdata);
+            return hr;
+        }
     }
 }

@@ -171,7 +171,10 @@ namespace IPSecDotNet5
             [DllImport("polstore", SetLastError = true)]
             protected static extern int IPSecCreatePolicyData(IntPtr hPolicyStore, IntPtr pIpsecPolicyData);
             #endregion
-
+            #region IPSecEnum
+            [DllImport("polstore", SetLastError = true)]
+            protected static extern int IPSecEnumNFAData(IntPtr hPolicyStore, Guid PolicyIdentifier, IntPtr pppIpsecNFAdata, IntPtr pdwNumNfaObjects);
+            #endregion
         }
         public static class Ipsec
         {
