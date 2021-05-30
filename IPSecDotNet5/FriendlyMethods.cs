@@ -177,6 +177,9 @@ namespace IPSecDotNet5
                 IntPtr pIpsecPolicyData = Marshal.ReadIntPtr(ppIpsecPolicyData, IntPtr.Size * i);
                 IPSEC_POLICY_DATA polData = (IPSEC_POLICY_DATA)Marshal.PtrToStructure(pIpsecPolicyData, typeof(IPSEC_POLICY_DATA));
                
+                //Believe I can just flush the reg if policy is not active,
+                //Suspect easier to do this way but also more dangerous if it falls over.
+
                 int testme = 5;
 
 
