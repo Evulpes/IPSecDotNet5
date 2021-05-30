@@ -9,6 +9,7 @@ namespace IPSecDotNet5
 {
     class IPSec : FriendlyMethods, IDisposable
     {
+        
         private IntPtr hStore;
         private bool disposedValue;
         private Guid policyId;
@@ -32,6 +33,7 @@ namespace IPSecDotNet5
             int hresult = IPSecGetAssignedPolicyData(hStore, out IPSEC_POLICY_DATA ipsecPolicyData);
             if (hresult == 0)
             {
+                hresult = IPSecEnumPolicyData(hStore, out IPSEC_POLICY_DATA[] ipsecPolicies);
                 throw new NotImplementedException("ToDo: Add IPSecEnumPolicyData and deletion");
             }
 

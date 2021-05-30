@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using static IPSecDotNet5.NativeMethods.Oakdefs;
+using Microsoft.Win32;
 namespace IPSecDotNet5
 {
     class FriendlyMethods : NativeMethods.Polstore2
     {
-
+        
+        [MarshalAs(UnmanagedType.LPWStr)] private static readonly string gpszIpsecRegRootContainer = "SOFTWARE\\Policies\\Microsoft\\Windows\\IPSec\\Policy\\Local";
         protected static int IPSecGetAssignedPolicyData(IntPtr hStore, out IPSEC_POLICY_DATA ipsecPolicyData)
         {
             int hr = IPSecGetAssignedPolicyData(hStore, out IntPtr ipsecPolicyDataPtr);
@@ -18,7 +19,7 @@ namespace IPSecDotNet5
                 ipsecPolicyData = Marshal.PtrToStructure<IPSEC_POLICY_DATA>(ipsecPolicyDataPtr);
             else
                 ipsecPolicyData = default;
-
+            
             return hr;
         }
         protected static int IPSecGetISAKMPData(IntPtr hStore, Guid ISAKMPGUID, out IPSEC_ISAKMP_DATA ipsecISAKMPData)
@@ -156,6 +157,34 @@ namespace IPSecDotNet5
             Marshal.FreeHGlobal(pNumNFAObjects);
 
             return hr;
+        }
+        protected static int IPSecEnumPolicyData(IntPtr hstore, out IPSEC_POLICY_DATA[] ipsecPolicies)
+        {
+            ipsecPolicies = default;
+            IntPtr pppIpsecPolicyData = Marshal.AllocHGlobal(IntPtr.Size);
+            IntPtr pNumPolicyObjects = Marshal.AllocHGlobal(IntPtr.Size);
+ 
+
+            int hresult = IPSecEnumPolicyData(hstore, pppIpsecPolicyData, pNumPolicyObjects);
+
+            IntPtr ppIpsecPolicyData = Marshal.ReadIntPtr(pppIpsecPolicyData);
+            int numPolicyObjects = Marshal.ReadInt32(pNumPolicyObjects);
+
+
+            for (int i = 0; i < numPolicyObjects; i++)
+            {
+
+                IntPtr pIpsecPolicyData = Marshal.ReadIntPtr(ppIpsecPolicyData, IntPtr.Size * i);
+                IPSEC_POLICY_DATA polData = (IPSEC_POLICY_DATA)Marshal.PtrToStructure(pIpsecPolicyData, typeof(IPSEC_POLICY_DATA));
+               
+                int testme = 5;
+
+
+            }
+
+            Marshal.FreeHGlobal(pppIpsecPolicyData);
+            Marshal.FreeHGlobal(pNumPolicyObjects);
+            return hresult;
         }
         protected static int IPSecCreatePolicyData(IntPtr hStore, IPSEC_POLICY_DATA ipsecPolicyData)
         {
